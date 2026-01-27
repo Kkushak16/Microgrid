@@ -102,6 +102,120 @@
         table { width: 100%; border-collapse: collapse; }
         th { text-align: left; padding: 12px; font-size: 11px; color: #64748b; border-bottom: 2px solid #f1f5f9; text-transform: uppercase; }
         td { padding: 12px; font-size: 13px; border-bottom: 1px solid #f1f5f9; }
+
+        /* Tooltip styles */
+        .tooltip-container {
+            position: relative;
+            display: inline-block;
+        }
+        .tooltip-icon {
+            cursor: help;
+            color: #94a3b8;
+            font-size: 12px;
+            margin-left: 4px;
+        }
+        .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: #1e293b;
+            color: #fff;
+            text-align: left;
+            border-radius: 8px;
+            padding: 8px 12px;
+            position: absolute;
+            z-index: 1000;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 11px;
+            line-height: 1.4;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #1e293b transparent transparent transparent;
+        }
+        .tooltip-container:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Battery status indicator */
+        .battery-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .battery-charging {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .battery-discharging {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .battery-idle {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        /* Preset buttons */
+        .preset-btn {
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid #e2e8f0;
+            background: white;
+        }
+        .preset-btn:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+            transform: translateY(-1px);
+        }
+
+        /* Glossary styles */
+        .glossary-term {
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+        .glossary-def {
+            color: #64748b;
+            font-size: 13px;
+            margin-bottom: 12px;
+            padding-left: 12px;
+            border-left: 2px solid #e2e8f0;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            aside {
+                width: 100%;
+                max-width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #e2e8f0;
+            }
+            #section-simulation {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body class="h-screen overflow-hidden flex flex-col">
@@ -126,6 +240,10 @@
         </nav>
 
         <div class="flex items-center gap-4">
+            <div id="battery-status-indicator" class="battery-status battery-idle">
+                <i class="fa-solid fa-battery-half"></i>
+                <span>IDLE</span>
+            </div>
             <div id="status-pill" class="px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold flex items-center gap-2">
                 <span class="relative flex h-2 w-2">
                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-slate-400 opacity-75"></span>
@@ -133,6 +251,9 @@
                 </span>
                 SYSTEM READY
             </div>
+            <button id="btn-export" class="px-3 py-1 rounded-lg bg-black text-white text-[10px] font-bold uppercase tracking-wider hover:bg-slate-800 transition hidden">
+                <i class="fa-solid fa-download"></i> Export
+            </button>
         </div>
     </header>
 
@@ -413,12 +534,81 @@
                                         </tr>
                                         <tr>
                                             <td class="font-bold">System</td>
-                                            <td>Kirchhoff’s Laws</td>
+                                            <td>Kirchhoff's Laws</td>
                                             <td>Power Balance: Gen + Storage Discharge = Load + Losses.</td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
+                        </div>
+                    </section>
+
+                    <!-- GLOSSARY SECTION -->
+                    <section class="border-t pt-16">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-10 h-10 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center font-bold text-lg">
+                                <i class="fa-solid fa-book"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-slate-800">Technical Glossary</h3>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+                            <div>
+                                <div class="glossary-term">MILP (Mixed-Integer Linear Programming)</div>
+                                <div class="glossary-def">An optimization method that handles both continuous variables (like power flow) and binary decisions (like generator on/off states) to find the most cost-effective solution.</div>
+                            </div>
+                            <div>
+                                <div class="glossary-term">LSTM (Long Short-Term Memory)</div>
+                                <div class="glossary-def">A type of recurrent neural network that can learn patterns over time, essential for predicting load based on historical consumption trends.</div>
+                            </div>
+                            <div>
+                                <div class="glossary-term">MOS (Model Output Statistics)</div>
+                                <div class="glossary-def">Statistical techniques that correct systematic errors in weather forecasts by learning from historical prediction vs. actual data at specific locations.</div>
+                            </div>
+                            <div>
+                                <div class="glossary-term">MPC (Model Predictive Control)</div>
+                                <div class="glossary-def">A control strategy that optimizes current decisions while considering future predictions over a "rolling horizon" that updates continuously.</div>
+                            </div>
+                            <div>
+                                <div class="glossary-term">EMS (Energy Management System)</div>
+                                <div class="glossary-def">The tertiary control layer that makes economic decisions hours ahead, scheduling when to charge/discharge based on price forecasts.</div>
+                            </div>
+                            <div>
+                                <div class="glossary-term">SoC (State of Charge)</div>
+                                <div class="glossary-def">The current energy level of a battery expressed as a percentage of total capacity (0-100%).</div>
+                            </div>
+                            <div>
+                                <div class="glossary-term">SoH (State of Health)</div>
+                                <div class="glossary-def">A measure of battery degradation, comparing current maximum capacity to the original rated capacity when new.</div>
+                            </div>
+                            <div>
+                                <div class="glossary-term">C-Rate</div>
+                                <div class="glossary-def">The rate at which a battery charges or discharges relative to its capacity. A 1C rate means fully charging/discharging in 1 hour.</div>
+                            </div>
+                            <div>
+                                <div class="glossary-term">SEI Layer (Solid Electrolyte Interphase)</div>
+                                <div class="glossary-def">A protective film that forms on battery anodes. Over time it grows thicker, trapping lithium ions and reducing battery capacity.</div>
+                            </div>
+                            <div>
+                                <div class="glossary-term">BSFC (Brake Specific Fuel Consumption)</div>
+                                <div class="glossary-def">A measure of diesel generator efficiency, expressed as fuel consumed per unit of power output (typically g/kWh).</div>
+                            </div>
+                            <div>
+                                <div class="glossary-term">Droop Control</div>
+                                <div class="glossary-def">A primary control method where power output automatically adjusts in response to frequency/voltage changes, providing grid stability in milliseconds.</div>
+                            </div>
+                            <div>
+                                <div class="glossary-term">BTM (Behind-The-Meter)</div>
+                                <div class="glossary-def">Energy resources located on the customer's side of the utility meter, like rooftop solar or on-site batteries.</div>
+                            </div>
+                        </div>
+                        <div class="mt-8 p-6 bg-slate-50 rounded-xl border">
+                            <h4 class="font-bold text-slate-900 mb-2 text-sm">References & Further Reading</h4>
+                            <ul class="text-xs text-slate-600 space-y-1 list-disc list-inside">
+                                <li>IEEE Standards for Microgrid Controllers (IEEE 2030.7-2017)</li>
+                                <li>NREL - Solar Forecasting Best Practices (Technical Report)</li>
+                                <li>Battery degradation models: Ecker et al. (2012) - Journal of Power Sources</li>
+                                <li>Wind power forecasting: Giebel et al. - State-of-the-art on methods and applications</li>
+                            </ul>
                         </div>
                     </section>
                 </div>
@@ -433,21 +623,33 @@
                     <div class="space-y-6">
                         <div>
                             <div class="flex justify-between text-xs font-medium mb-2">
-                                <span>Solar Intensity</span>
+                                <span class="tooltip-container">
+                                    Solar Intensity
+                                    <i class="fa-solid fa-circle-info tooltip-icon"></i>
+                                    <span class="tooltip-text">Peak solar irradiance as a percentage of maximum capacity. Higher values simulate sunny conditions.</span>
+                                </span>
                                 <span id="v-sol" class="text-amber-500 font-bold">60%</span>
                             </div>
                             <input type="range" id="s-sol" class="w-full" min="0" max="100" value="60">
                         </div>
                         <div>
                             <div class="flex justify-between text-xs font-medium mb-2">
-                                <span>Wind Magnitude</span>
+                                <span class="tooltip-container">
+                                    Wind Magnitude
+                                    <i class="fa-solid fa-circle-info tooltip-icon"></i>
+                                    <span class="tooltip-text">Average wind power output as a percentage. Wind power varies throughout the day based on typical patterns.</span>
+                                </span>
                                 <span id="v-wnd" class="text-blue-400 font-bold">30%</span>
                             </div>
                             <input type="range" id="s-wnd" class="w-full" min="0" max="100" value="30">
                         </div>
                         <div>
                             <div class="flex justify-between text-xs font-medium mb-2">
-                                <span>Base Load Demand</span>
+                                <span class="tooltip-container">
+                                    Base Load Demand
+                                    <i class="fa-solid fa-circle-info tooltip-icon"></i>
+                                    <span class="tooltip-text">Baseline building energy consumption. Actual load varies with time-of-day patterns (peaks morning and evening).</span>
+                                </span>
                                 <span id="v-lod" class="text-rose-500 font-bold">50 kW</span>
                             </div>
                             <input type="range" id="s-lod" class="w-full" min="10" max="150" value="50">
@@ -461,11 +663,33 @@
                         <div class="space-y-4">
                             <div>
                                 <div class="flex justify-between text-xs font-medium mb-2">
-                                    <span>Battery Capacity</span>
+                                    <span class="tooltip-container">
+                                        Battery Capacity
+                                        <i class="fa-solid fa-circle-info tooltip-icon"></i>
+                                        <span class="tooltip-text">Total energy storage capacity. Larger batteries allow more energy arbitrage and backup power duration.</span>
+                                    </span>
                                     <span id="v-bat" class="text-emerald-500 font-bold">200 kWh</span>
                                 </div>
                                 <input type="range" id="s-bat" class="w-full" min="50" max="1000" value="200">
                             </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Preset Scenarios</h2>
+                        <div class="grid grid-cols-2 gap-2 mb-4">
+                            <button class="preset-btn" onclick="applyPreset('sunny')">
+                                <i class="fa-solid fa-sun text-amber-500"></i> Sunny Day
+                            </button>
+                            <button class="preset-btn" onclick="applyPreset('cloudy')">
+                                <i class="fa-solid fa-cloud text-slate-400"></i> Cloudy
+                            </button>
+                            <button class="preset-btn" onclick="applyPreset('highdemand')">
+                                <i class="fa-solid fa-bolt text-rose-500"></i> High Demand
+                            </button>
+                            <button class="preset-btn" onclick="applyPreset('night')">
+                                <i class="fa-solid fa-moon text-indigo-400"></i> Night
+                            </button>
                         </div>
                     </div>
 
@@ -478,44 +702,199 @@
             </aside>
 
             <!-- Main Display Area -->
-            <section class="flex-1 flex flex-col overflow-hidden p-6 gap-6">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 shrink-0">
-                    <div class="glass-panel p-5 rounded-2xl stat-card">
-                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Operational Cost</p>
-                        <p id="stat-cost" class="text-2xl font-bold">$0.00</p>
+            <section class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden custom-scroll">
+                <div class="p-6 flex flex-col gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 shrink-0">
+                        <div class="glass-panel p-5 rounded-2xl stat-card">
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Operational Cost</p>
+                            <p id="stat-cost" class="text-2xl font-bold">$0.00</p>
+                        </div>
+                        <div class="glass-panel p-5 rounded-2xl stat-card">
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Baseline Comparison</p>
+                            <p id="stat-baseline" class="text-2xl font-bold text-slate-400">$0.00</p>
+                        </div>
+                        <div class="glass-panel p-5 rounded-2xl stat-card border-l-4 border-l-emerald-500">
+                            <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-1">Total Savings</p>
+                            <p id="stat-savings" class="text-2xl font-bold text-emerald-600">$0.00</p>
+                        </div>
                     </div>
-                    <div class="glass-panel p-5 rounded-2xl stat-card">
-                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Baseline Comparison</p>
-                        <p id="stat-baseline" class="text-2xl font-bold text-slate-400">$0.00</p>
-                    </div>
-                    <div class="glass-panel p-5 rounded-2xl stat-card border-l-4 border-l-emerald-500">
-                        <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-1">Total Savings</p>
-                        <p id="stat-savings" class="text-2xl font-bold text-emerald-600">$0.00</p>
-                    </div>
-                </div>
 
-                <div class="flex-1 min-h-0 flex flex-col gap-6">
-                    <div class="h-[45%] glass-panel p-6 rounded-2xl flex flex-col min-h-0">
-                        <div class="flex justify-between items-center mb-4 shrink-0">
-                            <h3 class="text-sm font-bold">Power Dispatch Profile (24h)</h3>
-                            <div class="flex gap-4 text-[10px] font-bold">
-                                <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-amber-500"></i> SOLAR</span>
-                                <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-rose-500"></i> LOAD</span>
-                                <span class="flex items-center gap-1"><i class="fa-solid fa-square text-blue-400"></i> GRID</span>
+                    <div class="grid grid-cols-1 gap-6">
+                        <div class="h-[400px] glass-panel p-6 rounded-2xl flex flex-col">
+                            <div class="flex justify-between items-center mb-4 shrink-0">
+                                <h3 class="text-sm font-bold">Power Dispatch Profile (24h)</h3>
+                                <div class="flex gap-4 text-[10px] font-bold">
+                                    <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-amber-500"></i> SOLAR</span>
+                                    <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-rose-500"></i> LOAD</span>
+                                    <span class="flex items-center gap-1"><i class="fa-solid fa-square text-blue-400"></i> GRID</span>
+                                </div>
+                            </div>
+                            <div class="flex-1 min-h-0 relative">
+                                <canvas id="pwrChart"></canvas>
                             </div>
                         </div>
-                        <div class="flex-1 min-h-0 relative">
-                            <canvas id="pwrChart"></canvas>
+
+                        <div class="h-[400px] glass-panel p-6 rounded-2xl flex flex-col">
+                            <div class="flex justify-between items-center mb-4 shrink-0">
+                                <h3 class="text-lg font-extrabold text-slate-800">Battery State of Charge (%)</h3>
+                                <div class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded">STORAGE CAPACITY MONITOR</div>
+                            </div>
+                            <div class="flex-1 min-h-0 relative">
+                                <canvas id="socChart"></canvas>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="flex-1 glass-panel p-6 rounded-2xl flex flex-col min-h-0">
-                        <div class="flex justify-between items-center mb-4 shrink-0">
-                            <h3 class="text-lg font-extrabold text-slate-800">Battery State of Charge (%)</h3>
-                            <div class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded">STORAGE CAPACITY MONITOR</div>
+                    <!-- OPTIMIZATION STRATEGY SUMMARY -->
+                    <div class="mt-6">
+                        <div class="glass-panel p-8 rounded-2xl">
+                    <div class="mb-8">
+                        <h2 class="text-2xl font-bold text-slate-900 mb-2">Integration Strategy: Two-Stage Optimization</h2>
+                        <p class="text-slate-600">The most effective strategy uses a "nested" approach: Day-Ahead Planning (for long-term cost) and Real-Time Rescheduling (for immediate physics).</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+                        <div class="bg-white p-6 rounded-xl border-l-4 border-l-violet-500">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-10 h-10 rounded-lg bg-violet-100 text-violet-600 flex items-center justify-center font-bold">1</div>
+                                <h3 class="text-lg font-bold text-slate-900">Day-Ahead "Economic Dispatch"</h3>
+                            </div>
+                            <p class="text-sm text-slate-600 mb-4">Every night (e.g., at 00:00), the system runs an optimization for the next 24 hours based on forecasts.</p>
+                            <div class="space-y-2">
+                                <div class="flex gap-2 items-start">
+                                    <span class="text-violet-600 font-bold">•</span>
+                                    <p class="text-xs text-slate-700"><b>Goal:</b> Determine the "on/off" status of the diesel generator and the ideal battery State of Charge (SoC).</p>
+                                </div>
+                                <div class="flex gap-2 items-start">
+                                    <span class="text-violet-600 font-bold">•</span>
+                                    <p class="text-xs text-slate-700"><b>Logic:</b> It looks for the cheapest time to charge the battery (either from excess solar or low-price grid electricity) and the best time to discharge it to avoid "peak pricing" or high-load events.</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="flex-1 min-h-0 relative">
-                            <canvas id="socChart"></canvas>
+
+                        <div class="bg-white p-6 rounded-xl border-l-4 border-l-blue-500">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-10 h-10 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center font-bold">2</div>
+                                <h3 class="text-lg font-bold text-slate-900">Real-Time "Receding Horizon"</h3>
+                            </div>
+                            <p class="text-sm text-slate-600 mb-4">Every 15 minutes, the system re-evaluates. If a cloud passes (solar drop) or a machine starts up (load spike), the system adjusts the stage 1 plan without violating the long-term battery health constraints.</p>
+                        </div>
+                    </div>
+
+                    <!-- Mathematical Objective Function -->
+                    <div class="bg-slate-900 text-white p-8 rounded-2xl mb-10">
+                        <h3 class="text-xl font-bold mb-4 text-emerald-400">Mathematical Objective Function</h3>
+                        <p class="text-sm text-slate-300 mb-6">The controller uses a Mixed-Integer Linear Programming (MILP) model to solve the following cost equation for every hour (t):</p>
+                        <div class="bg-slate-800 p-6 rounded-xl mb-6 overflow-x-auto">
+                            <div class="font-mono text-sm text-center whitespace-nowrap">
+                                J = min Σ<sub>t=1→24</sub> [C<sub>grid</sub>(t) · P<sub>grid</sub>(t)] + [C<sub>fuel</sub> · F(P<sub>gen,t</sub>)] + [C<sub>deg</sub> · |P<sub>bat,t</sub>|]
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                            <div class="bg-slate-800 p-4 rounded-lg">
+                                <div class="font-bold text-blue-400 mb-1">Grid Cost (C<sub>grid</sub>)</div>
+                                <div class="text-slate-400">Fluctuates based on Time-of-Use (ToU) rates.</div>
+                            </div>
+                            <div class="bg-slate-800 p-4 rounded-lg">
+                                <div class="font-bold text-amber-400 mb-1">Battery Cost (C<sub>deg</sub>)</div>
+                                <div class="text-slate-400">A "hidden" cost assigned to every kWh moved through the battery to account for degradation.</div>
+                            </div>
+                            <div class="bg-slate-800 p-4 rounded-lg">
+                                <div class="font-bold text-rose-400 mb-1">Fuel Curve (F)</div>
+                                <div class="text-slate-400">Non-linear cost that ensures the generator stays in the 60–80% efficiency "sweet spot."</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hourly Execution Playbook -->
+                    <div class="mb-10">
+                        <h3 class="text-xl font-bold text-slate-900 mb-6">The Hourly Execution Playbook</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full bg-white rounded-xl overflow-hidden shadow-sm">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="text-left p-4 font-bold text-xs uppercase text-slate-600">Time Block</th>
+                                        <th class="text-left p-4 font-bold text-xs uppercase text-slate-600">Strategy Phase</th>
+                                        <th class="text-left p-4 font-bold text-xs uppercase text-slate-600">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    <tr>
+                                        <td class="p-4 font-mono text-sm font-bold">00:00 – 05:00</td>
+                                        <td class="p-4"><span class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-bold">Pre-Charging</span></td>
+                                        <td class="p-4 text-sm text-slate-600">If grid prices are low, charge the battery to 80%. Keep the generator OFF.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-4 font-mono text-sm font-bold">06:00 – 09:00</td>
+                                        <td class="p-4"><span class="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-bold">Peak Shaving</span></td>
+                                        <td class="p-4 text-sm text-slate-600">As the morning load spikes, discharge the battery to prevent "Demand Charges" from the grid.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-4 font-mono text-sm font-bold">10:00 – 15:00</td>
+                                        <td class="p-4"><span class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-bold">Solar Arbitrage</span></td>
+                                        <td class="p-4 text-sm text-slate-600">Use solar to power the load. Divert all excess solar to the battery until it reaches 95%.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-4 font-mono text-sm font-bold">16:00 – 20:00</td>
+                                        <td class="p-4"><span class="px-3 py-1 bg-rose-100 text-rose-700 rounded-full text-xs font-bold">Load Leveling</span></td>
+                                        <td class="p-4 text-sm text-slate-600">Grid prices are highest now. Force the battery to carry the majority of the load.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-4 font-mono text-sm font-bold">21:00 – 23:00</td>
+                                        <td class="p-4"><span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-bold">Recovery</span></td>
+                                        <td class="p-4 text-sm text-slate-600">Allow the battery to rest. If SoC is critically low, run the generator at its peak efficiency to recharge the battery for tomorrow.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Operational Constraints -->
+                    <div class="bg-gradient-to-br from-slate-50 to-blue-50 p-8 rounded-2xl mb-10">
+                        <h3 class="text-xl font-bold text-slate-900 mb-4">Key Operational Constraints (The "Guardrails")</h3>
+                        <p class="text-sm text-slate-600 mb-6">The scheduling strategy is only valid if it respects the physical limits of the system:</p>
+                        <div class="space-y-4">
+                            <div class="flex gap-4 items-start bg-white p-4 rounded-lg shadow-sm">
+                                <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-sm shrink-0">⚡</div>
+                                <div>
+                                    <div class="font-bold text-slate-900 mb-1">Power Balance</div>
+                                    <div class="text-sm text-slate-600 font-mono">P<sub>solar</sub>(t) + P<sub>wind</sub>(t) + P<sub>bat,discharge</sub>(t) + P<sub>gen</sub>(t) = P<sub>load</sub>(t) + P<sub>losses</sub>(t)</div>
+                                </div>
+                            </div>
+                            <div class="flex gap-4 items-start bg-white p-4 rounded-lg shadow-sm">
+                                <div class="w-8 h-8 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center font-bold text-sm shrink-0">🔋</div>
+                                <div>
+                                    <div class="font-bold text-slate-900 mb-1">Battery Floor</div>
+                                    <div class="text-sm text-slate-600">Never let the SoC drop below 20% to prevent chemical "starvation."</div>
+                                </div>
+                            </div>
+                            <div class="flex gap-4 items-start bg-white p-4 rounded-lg shadow-sm">
+                                <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center font-bold text-sm shrink-0">⚙️</div>
+                                <div>
+                                    <div class="font-bold text-slate-900 mb-1">Generator Min-Run</div>
+                                    <div class="text-sm text-slate-600">If the diesel generator is started, it must run for at least 60 minutes to prevent mechanical "wet-stacking."</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Summary of Benefits -->
+                    <div class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white p-8 rounded-2xl">
+                        <h3 class="text-2xl font-bold mb-4">Summary of Benefits</h3>
+                        <p class="text-emerald-50 mb-6">By using this predictive strategy instead of a simple "rule-based" (if-then) approach, microgrids typically see:</p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="bg-white/10 backdrop-blur-sm p-6 rounded-xl">
+                                <div class="text-4xl font-bold mb-2">15–25%</div>
+                                <div class="text-emerald-50 text-sm">Reduction in total electricity costs</div>
+                            </div>
+                            <div class="bg-white/10 backdrop-blur-sm p-6 rounded-xl">
+                                <div class="text-4xl font-bold mb-2">30%</div>
+                                <div class="text-emerald-50 text-sm">Increase in battery cycle life</div>
+                            </div>
+                            <div class="bg-white/10 backdrop-blur-sm p-6 rounded-xl">
+                                <div class="text-4xl font-bold mb-2">↓CO₂</div>
+                                <div class="text-emerald-50 text-sm">Significant reduction in carbon footprint by maximizing renewable "self-consumption"</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -527,11 +906,13 @@
         let gridActive = true;
         let pChart, sChart;
 
+        // Show export button when on simulation tab
         function switchTab(tab) {
             const simSection = document.getElementById('section-simulation');
             const conSection = document.getElementById('section-concept');
             const tabSim = document.getElementById('tab-simulation');
             const tabCon = document.getElementById('tab-concept');
+            const exportBtn = document.getElementById('btn-export');
 
             if (tab === 'simulation') {
                 simSection.classList.remove('hidden-section');
@@ -540,6 +921,7 @@
                 tabSim.classList.remove('text-gray-400');
                 tabCon.classList.remove('tab-active');
                 tabCon.classList.add('text-gray-400');
+                exportBtn.classList.remove('hidden');
                 if (pChart) pChart.resize();
                 if (sChart) sChart.resize();
             } else {
@@ -549,6 +931,7 @@
                 tabCon.classList.remove('text-gray-400');
                 tabSim.classList.remove('tab-active');
                 tabSim.classList.add('text-gray-400');
+                exportBtn.classList.add('hidden');
             }
         }
 
@@ -587,29 +970,74 @@
             let soc = 50.0;
             let socHist = [];
             let gridHist = [];
+            let battHist = [];
             let cost = 0, baseline = 0;
+            let batteryStatus = 'idle';
 
             for (let h = 0; h < 24; h++) {
                 let isPeak = (h >= 17 && h <= 21);
                 let price = isPeak ? pHigh : pLow;
-                let net = (solar[h] + wind[h]) - load[h];
+                
+                // CRITICAL FIX: Include wind in renewable generation
+                let renewable = solar[h] + wind[h];
+                let net = renewable - load[h];
+                
+                // Calculate baseline cost (no battery, all from grid)
                 if (net < 0) baseline += Math.abs(net) * price;
 
                 let pGrid = 0, pBatt = 0;
+                
+                // Battery constraints
+                const socMin = cap * 0.10;  // 10% minimum
+                const socMax = cap * 0.95;  // 95% maximum
+                const socAvailable = soc - socMin;  // Energy available for discharge
+                const socRoom = socMax - soc;       // Room available for charge
+                
                 if (!gridActive) {
-                    pBatt = Math.max(-(soc - (cap * 0.1)), Math.min(net, (cap * 0.95 - soc)));
+                    // Islanded mode - use battery to balance
+                    if (net > 0) {
+                        // Surplus - charge battery if room available
+                        pBatt = Math.min(net, socRoom);
+                    } else {
+                        // Deficit - discharge battery if energy available
+                        pBatt = Math.max(net, -socAvailable);
+                    }
+                    pGrid = 0;
                 } else {
-                    if (isPeak && net < 0) pBatt = Math.max(net, -(soc - (cap * 0.1)));
-                    else if (net > 0) pBatt = Math.min(net, (cap * 0.95 - soc));
+                    // Grid-connected mode - optimize economically
+                    if (isPeak && net < 0) {
+                        // Peak hours with deficit - discharge battery if available
+                        pBatt = Math.max(net, -socAvailable);
+                    } else if (net > 0) {
+                        // Surplus - charge battery if room available
+                        pBatt = Math.min(net, socRoom);
+                    } else {
+                        pBatt = 0;
+                    }
                     pGrid = -(net - pBatt);
                 }
 
-                if (pBatt > 0) soc += pBatt * eff; else soc += pBatt / eff;
+                // CRITICAL FIX: Apply battery efficiency and update SOC with proper limits
+                let socChange = pBatt > 0 ? pBatt * eff : pBatt / eff;
+                let newSoc = soc + socChange;
+                
+                // Enforce hard limits
+                newSoc = Math.max(socMin, Math.min(socMax, newSoc));
+                socChange = newSoc - soc;
+                soc = newSoc;
+                
                 socHist.push((soc / cap) * 100);
                 gridHist.push(pGrid);
+                battHist.push(pBatt);
                 cost += Math.max(0, pGrid) * price;
+                
+                // Determine battery status
+                if (Math.abs(pBatt) < 0.5) batteryStatus = 'idle';
+                else if (pBatt > 0) batteryStatus = 'charging';
+                else batteryStatus = 'discharging';
             }
-            return { T, solar, load, gridHist, socHist, cost, baseline };
+            
+            return { T, solar, wind, load, gridHist, socHist, battHist, cost, baseline, batteryStatus };
         }
 
         function refreshSimulation() {
@@ -620,7 +1048,29 @@
             view.vBat.innerText = inputs.bat.value + " kWh";
             view.statCost.innerText = `$${d.cost.toFixed(2)}`;
             view.statBaseline.innerText = `$${d.baseline.toFixed(2)}`;
-            view.statSavings.innerText = `$${(d.baseline - d.cost).toFixed(2)}`;
+            
+            // CRITICAL FIX: Handle negative savings properly
+            const savings = d.baseline - d.cost;
+            if (savings >= 0) {
+                view.statSavings.innerText = `$${savings.toFixed(2)}`;
+                view.statSavings.className = 'text-2xl font-bold text-emerald-600';
+            } else {
+                view.statSavings.innerText = `-$${Math.abs(savings).toFixed(2)}`;
+                view.statSavings.className = 'text-2xl font-bold text-rose-600';
+            }
+
+            // Update battery status indicator
+            const batteryStatusEl = document.getElementById('battery-status-indicator');
+            if (d.batteryStatus === 'charging') {
+                batteryStatusEl.className = 'battery-status battery-charging';
+                batteryStatusEl.innerHTML = '<i class="fa-solid fa-battery-three-quarters"></i><span>CHARGING</span>';
+            } else if (d.batteryStatus === 'discharging') {
+                batteryStatusEl.className = 'battery-status battery-discharging';
+                batteryStatusEl.innerHTML = '<i class="fa-solid fa-battery-quarter"></i><span>DISCHARGING</span>';
+            } else {
+                batteryStatusEl.className = 'battery-status battery-idle';
+                batteryStatusEl.innerHTML = '<i class="fa-solid fa-battery-half"></i><span>IDLE</span>';
+            }
 
             if(gridActive) {
                 view.statusPill.innerHTML = `<span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-slate-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-slate-500"></span></span> SYSTEM ONLINE`;
@@ -654,8 +1104,24 @@
                     maintainAspectRatio: false, 
                     plugins: { legend: { display: false } },
                     scales: { 
-                        y: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } },
-                        x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+                        y: { 
+                            grid: { color: '#f1f5f9' }, 
+                            ticks: { font: { size: 10 } },
+                            title: {
+                                display: true,
+                                text: 'Power (kW)',
+                                font: { size: 11, weight: '600' }
+                            }
+                        },
+                        x: { 
+                            grid: { display: false }, 
+                            ticks: { font: { size: 10 } },
+                            title: {
+                                display: true,
+                                text: 'Time (hours)',
+                                font: { size: 11, weight: '600' }
+                            }
+                        }
                     } 
                 }
             });
@@ -672,20 +1138,104 @@
                     maintainAspectRatio: false, 
                     plugins: { legend: { display: false } },
                     scales: { 
-                        y: { min: 0, max: 100, grid: { color: '#f1f5f9' }, ticks: { font: { size: 11, weight: '600' } } },
-                        x: { grid: { display: false }, ticks: { font: { size: 11 } } }
+                        y: { 
+                            min: 0, 
+                            max: 100, 
+                            grid: { color: '#f1f5f9' }, 
+                            ticks: { font: { size: 11, weight: '600' } },
+                            title: {
+                                display: true,
+                                text: 'State of Charge (%)',
+                                font: { size: 11, weight: '600' }
+                            }
+                        },
+                        x: { 
+                            grid: { display: false }, 
+                            ticks: { font: { size: 11 } },
+                            title: {
+                                display: true,
+                                text: 'Time (hours)',
+                                font: { size: 11, weight: '600' }
+                            }
+                        }
                     } 
                 }
             });
 
             Object.values(inputs).forEach(i => i.addEventListener('input', refreshSimulation));
             document.getElementById('btn-grid').onclick = () => { gridActive = !gridActive; refreshSimulation(); };
-            document.getElementById('btn-storm').onclick = () => { inputs.sol.value = 5; gridActive = false; refreshSimulation(); };
+            document.getElementById('btn-storm').onclick = () => { 
+                inputs.sol.value = 5; 
+                inputs.wnd.value = 85;  // CRITICAL FIX: Increase wind during storm
+                gridActive = false; 
+                refreshSimulation(); 
+            };
             document.getElementById('btn-reset').onclick = () => { 
                 inputs.sol.value = 60; inputs.wnd.value = 30; inputs.lod.value = 50; inputs.bat.value = 200;
                 gridActive = true; refreshSimulation(); 
             };
+            
+            // Export functionality
+            document.getElementById('btn-export').onclick = exportData;
+            
             refreshSimulation();
+        }
+
+        // Preset scenarios
+        function applyPreset(scenario) {
+            switch(scenario) {
+                case 'sunny':
+                    inputs.sol.value = 95;
+                    inputs.wnd.value = 20;
+                    inputs.lod.value = 50;
+                    gridActive = true;
+                    break;
+                case 'cloudy':
+                    inputs.sol.value = 25;
+                    inputs.wnd.value = 60;
+                    inputs.lod.value = 50;
+                    gridActive = true;
+                    break;
+                case 'highdemand':
+                    inputs.sol.value = 60;
+                    inputs.wnd.value = 30;
+                    inputs.lod.value = 120;
+                    gridActive = true;
+                    break;
+                case 'night':
+                    inputs.sol.value = 0;
+                    inputs.wnd.value = 45;
+                    inputs.lod.value = 70;
+                    gridActive = true;
+                    break;
+            }
+            refreshSimulation();
+        }
+
+        // Export simulation data
+        function exportData() {
+            const d = calculateSimulation();
+            const csvContent = [
+                ['Hour', 'Solar (kW)', 'Wind (kW)', 'Load (kW)', 'Grid (kW)', 'Battery SoC (%)'],
+                ...d.T.map((h, i) => [
+                    h, 
+                    d.solar[i].toFixed(2), 
+                    d.wind[i].toFixed(2),
+                    d.load[i].toFixed(2), 
+                    d.gridHist[i].toFixed(2), 
+                    d.socHist[i].toFixed(2)
+                ])
+            ].map(row => row.join(',')).join('\n');
+            
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `heti-simulation-${new Date().toISOString().slice(0,10)}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
 
         window.onload = initSimulation;
