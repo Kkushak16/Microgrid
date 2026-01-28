@@ -7,6 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
@@ -211,10 +213,247 @@
                 max-width: 100%;
                 border-right: none;
                 border-bottom: 1px solid #e2e8f0;
+                order: 2; /* Move sidebar after main content on mobile */
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+                background: white;
+                box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+                transition: max-height 0.3s ease;
             }
             #section-simulation {
                 flex-direction: column;
             }
+            .chart-container-mobile {
+                min-height: 500px !important;
+                height: 500px !important;
+            }
+            .stats-grid-mobile {
+                grid-template-columns: 1fr 1fr 1fr !important;
+                gap: 0.5rem !important;
+            }
+            .stat-card-mobile {
+                padding: 0.75rem !important;
+            }
+            .stat-card-mobile p:first-child {
+                font-size: 8px !important;
+                margin-bottom: 0.25rem !important;
+            }
+            .stat-card-mobile p:last-child {
+                font-size: 1rem !important;
+            }
+            .mobile-main-content {
+                order: 1; /* Show charts first on mobile */
+                padding-bottom: 2rem;
+            }
+            aside.collapsed-mobile {
+                max-height: 0px;
+                overflow: hidden;
+                box-shadow: none;
+            }
+            .sidebar-content-mobile {
+                display: block;
+                max-height: 70vh;
+                overflow-y: auto;
+            }
+            aside.collapsed-mobile .sidebar-content-mobile {
+                display: none;
+            }
+            .mobile-toggle-btn {
+                display: block !important;
+                width: 100%;
+                padding: 1rem;
+                margin-bottom: 1rem;
+                background: linear-gradient(135deg, #000 0%, #374151 100%);
+                color: white;
+                border: none;
+                border-radius: 12px;
+                font-weight: bold;
+                text-transform: uppercase;
+                font-size: 11px;
+                letter-spacing: 0.1em;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
+            .mobile-toggle-icon {
+                transition: transform 0.3s ease;
+            }
+            aside.collapsed-mobile .mobile-toggle-icon {
+                transform: rotate(180deg);
+            }
+        }
+        
+        .mobile-toggle-btn {
+            display: none;
+        }
+
+        /* Decision log styles */
+        .decision-log {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .decision-item {
+            padding: 12px;
+            border-left: 3px solid #e2e8f0;
+            margin-bottom: 8px;
+            background: #f8fafc;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .decision-item:hover {
+            background: #f1f5f9;
+            border-left-color: #000;
+        }
+        .decision-time {
+            font-weight: 700;
+            font-size: 11px;
+            color: #64748b;
+            text-transform: uppercase;
+        }
+        .decision-action {
+            font-size: 13px;
+            color: #1e293b;
+            margin-top: 4px;
+        }
+        .decision-reason {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 4px;
+            font-style: italic;
+        }
+
+        /* Weather pattern styles */
+        .weather-card {
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+        }
+        .weather-card:hover {
+            border-color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .weather-card.active {
+            border-color: #000;
+            background: #f8fafc;
+        }
+
+        /* Day selector */
+        .day-selector {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 4px;
+        }
+        .day-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .day-btn:hover {
+            border-color: #cbd5e1;
+        }
+        .day-btn.active {
+            background: #000;
+            color: white;
+            border-color: #000;
+        }
+
+        /* Touch-optimized slider */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            outline: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: #000;
+            cursor: pointer;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            background: #000;
+            cursor: pointer;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* Swipe indicator */
+        .swipe-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            display: none;
+            z-index: 1000;
+            animation: fadeInOut 2s ease-in-out;
+        }
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        /* Chart zoom controls */
+        .chart-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 4px;
+            z-index: 10;
+        }
+        .chart-btn {
+            width: 32px;
+            height: 32px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+            color: #64748b;
+            transition: all 0.2s;
+        }
+        .chart-btn:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+            color: #000;
+        }
+        .chart-btn:active {
+            transform: scale(0.95);
         }
     </style>
 </head>
@@ -617,7 +856,8 @@
 
         <!-- SECTION: SIMULATION -->
         <div id="section-simulation" class="hidden-section flex h-full">
-            <aside class="w-80 bg-white border-r flex flex-col overflow-hidden">
+            <aside id="mobile-sidebar" class="w-80 bg-white border-r flex flex-col overflow-hidden collapsed-mobile">
+                <div class="sidebar-content-mobile">
                 <div class="p-6 border-b shrink-0">
                     <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Environment Parameters</h2>
                     <div class="space-y-6">
@@ -659,6 +899,57 @@
 
                 <div class="flex-1 overflow-y-auto p-6 custom-scroll space-y-8">
                     <div>
+                        <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Simulation Duration</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-xs font-medium mb-2">
+                                    <span>Number of Days</span>
+                                    <span id="v-days" class="text-indigo-600 font-bold">1 Day</span>
+                                </div>
+                                <input type="range" id="s-days" class="w-full" min="1" max="7" value="1">
+                            </div>
+                            <div id="day-selector-container" class="hidden">
+                                <div class="text-xs font-medium mb-2">View Day:</div>
+                                <div id="day-selector" class="day-selector"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Weather Pattern</h2>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="weather-card active" data-weather="typical" onclick="selectWeather('typical')">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <i class="fa-solid fa-cloud-sun text-amber-500"></i>
+                                    <span class="font-bold text-xs">Typical</span>
+                                </div>
+                                <p class="text-[10px] text-slate-500">Normal sunny pattern</p>
+                            </div>
+                            <div class="weather-card" data-weather="intermittent" onclick="selectWeather('intermittent')">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <i class="fa-solid fa-cloud text-slate-400"></i>
+                                    <span class="font-bold text-xs">Cloudy</span>
+                                </div>
+                                <p class="text-[10px] text-slate-500">Passing clouds</p>
+                            </div>
+                            <div class="weather-card" data-weather="rainy" onclick="selectWeather('rainy')">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <i class="fa-solid fa-cloud-rain text-blue-500"></i>
+                                    <span class="font-bold text-xs">Rainy</span>
+                                </div>
+                                <p class="text-[10px] text-slate-500">Low solar, high wind</p>
+                            </div>
+                            <div class="weather-card" data-weather="heatwave" onclick="selectWeather('heatwave')">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <i class="fa-solid fa-sun text-rose-500"></i>
+                                    <span class="font-bold text-xs">Heatwave</span>
+                                </div>
+                                <p class="text-[10px] text-slate-500">High solar & load</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
                         <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Hardware Config</h2>
                         <div class="space-y-4">
                             <div>
@@ -699,28 +990,46 @@
                         <button id="btn-reset" class="w-full py-3 rounded-xl border border-rose-200 text-rose-600 text-xs font-bold uppercase tracking-widest hover:bg-rose-50 transition">Factory Reset</button>
                     </div>
                 </div>
+                </div>
             </aside>
 
             <!-- Main Display Area -->
-            <section class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden custom-scroll">
+            <section class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden custom-scroll mobile-main-content">
                 <div class="p-6 flex flex-col gap-6">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 shrink-0">
-                        <div class="glass-panel p-5 rounded-2xl stat-card">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 shrink-0 stats-grid-mobile">
+                        <div class="glass-panel p-5 rounded-2xl stat-card stat-card-mobile">
                             <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Operational Cost</p>
                             <p id="stat-cost" class="text-2xl font-bold">$0.00</p>
                         </div>
-                        <div class="glass-panel p-5 rounded-2xl stat-card">
+                        <div class="glass-panel p-5 rounded-2xl stat-card stat-card-mobile">
                             <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Baseline Comparison</p>
                             <p id="stat-baseline" class="text-2xl font-bold text-slate-400">$0.00</p>
                         </div>
-                        <div class="glass-panel p-5 rounded-2xl stat-card border-l-4 border-l-emerald-500">
+                        <div class="glass-panel p-5 rounded-2xl stat-card stat-card-mobile border-l-4 border-l-emerald-500">
                             <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-1">Total Savings</p>
                             <p id="stat-savings" class="text-2xl font-bold text-emerald-600">$0.00</p>
                         </div>
                     </div>
 
+                    <!-- Mobile Settings Toggle Button -->
+                    <button class="mobile-toggle-btn" onclick="toggleMobileSidebar()">
+                        <span>⚙️ Adjust Parameters</span>
+                        <span class="mobile-toggle-icon">▼</span>
+                    </button>
+
+                    <!-- Decision Log Panel -->
+                    <div class="glass-panel p-6 rounded-2xl">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-sm font-bold">Battery Decision Log</h3>
+                            <button onclick="toggleDecisionLog()" class="text-xs text-slate-600 hover:text-slate-900">
+                                <i class="fa-solid fa-chevron-down" id="log-toggle-icon"></i>
+                            </button>
+                        </div>
+                        <div id="decision-log" class="decision-log"></div>
+                    </div>
+
                     <div class="grid grid-cols-1 gap-6">
-                        <div class="h-[400px] glass-panel p-6 rounded-2xl flex flex-col">
+                        <div class="h-[400px] chart-container-mobile glass-panel p-6 rounded-2xl flex flex-col">
                             <div class="flex justify-between items-center mb-4 shrink-0">
                                 <h3 class="text-sm font-bold">Power Dispatch Profile (24h)</h3>
                                 <div class="flex gap-4 text-[10px] font-bold">
@@ -730,16 +1039,26 @@
                                 </div>
                             </div>
                             <div class="flex-1 min-h-0 relative">
+                                <div class="chart-controls">
+                                    <button class="chart-btn" onclick="resetZoom('power')" title="Reset Zoom">
+                                        <i class="fa-solid fa-expand"></i>
+                                    </button>
+                                </div>
                                 <canvas id="pwrChart"></canvas>
                             </div>
                         </div>
 
-                        <div class="h-[400px] glass-panel p-6 rounded-2xl flex flex-col">
+                        <div class="h-[400px] chart-container-mobile glass-panel p-6 rounded-2xl flex flex-col">
                             <div class="flex justify-between items-center mb-4 shrink-0">
                                 <h3 class="text-lg font-extrabold text-slate-800">Battery State of Charge (%)</h3>
                                 <div class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded">STORAGE CAPACITY MONITOR</div>
                             </div>
                             <div class="flex-1 min-h-0 relative">
+                                <div class="chart-controls">
+                                    <button class="chart-btn" onclick="resetZoom('soc')" title="Reset Zoom">
+                                        <i class="fa-solid fa-expand"></i>
+                                    </button>
+                                </div>
                                 <canvas id="socChart"></canvas>
                             </div>
                         </div>
@@ -902,9 +1221,45 @@
         </div>
     </main>
 
+    <!-- Swipe Indicator -->
+    <div id="swipe-indicator" class="swipe-indicator"></div>
+
     <script>
         let gridActive = true;
         let pChart, sChart;
+        let currentDay = 0;
+        let numDays = 1;
+        let weatherPattern = 'typical';
+        let decisionLogExpanded = true;
+        let allDaysData = [];
+
+        // Weather pattern configurations
+        const weatherPatterns = {
+            typical: {
+                solarMultiplier: 1.0,
+                windMultiplier: 1.0,
+                loadMultiplier: 1.0,
+                variability: 0.1
+            },
+            intermittent: {
+                solarMultiplier: 0.6,
+                windMultiplier: 0.8,
+                loadMultiplier: 1.0,
+                variability: 0.3
+            },
+            rainy: {
+                solarMultiplier: 0.2,
+                windMultiplier: 1.5,
+                loadMultiplier: 0.9,
+                variability: 0.2
+            },
+            heatwave: {
+                solarMultiplier: 1.2,
+                windMultiplier: 0.5,
+                loadMultiplier: 1.4,
+                variability: 0.05
+            }
+        };
 
         // Show export button when on simulation tab
         function switchTab(tab) {
@@ -924,6 +1279,7 @@
                 exportBtn.classList.remove('hidden');
                 if (pChart) pChart.resize();
                 if (sChart) sChart.resize();
+                showSwipeIndicator('Swipe left/right on charts to navigate');
             } else {
                 simSection.classList.add('hidden-section');
                 conSection.classList.remove('hidden-section');
@@ -939,7 +1295,8 @@
             sol: document.getElementById('s-sol'),
             wnd: document.getElementById('s-wnd'),
             lod: document.getElementById('s-lod'),
-            bat: document.getElementById('s-bat')
+            bat: document.getElementById('s-bat'),
+            days: document.getElementById('s-days')
         };
 
         const view = {
@@ -947,97 +1304,284 @@
             vWnd: document.getElementById('v-wnd'),
             vLod: document.getElementById('v-lod'),
             vBat: document.getElementById('v-bat'),
+            vDays: document.getElementById('v-days'),
             statCost: document.getElementById('stat-cost'),
             statBaseline: document.getElementById('stat-baseline'),
             statSavings: document.getElementById('stat-savings'),
             statusPill: document.getElementById('status-pill')
         };
 
-        function calculateSimulation() {
-            const T = Array.from({length: 24}, (_, i) => i);
-            const solVal = parseFloat(inputs.sol.value);
-            const wndVal = parseFloat(inputs.wnd.value);
-            const lodVal = parseFloat(inputs.lod.value);
-            const cap = parseFloat(inputs.bat.value);
-            const pHigh = 0.35;
-            const pLow = 0.12;
-            const eff = 0.95;
+        function showSwipeIndicator(message) {
+            const indicator = document.getElementById('swipe-indicator');
+            indicator.textContent = message;
+            indicator.style.display = 'block';
+            setTimeout(() => {
+                indicator.style.display = 'none';
+            }, 2000);
+        }
 
-            const solar = T.map(h => solVal * Math.exp(-Math.pow(h - 12, 2) / (2 * Math.pow(2.5, 2))));
-            const wind = T.map(h => wndVal * (0.7 + 0.3 * Math.cos(h / 3)));
-            const load = T.map(h => lodVal * (1 + 0.8 * Math.exp(-Math.pow(h - 19, 2) / 5) + 0.5 * Math.exp(-Math.pow(h - 8, 2) / 3)));
+        function selectWeather(pattern) {
+            weatherPattern = pattern;
+            document.querySelectorAll('.weather-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            document.querySelector(`[data-weather="${pattern}"]`).classList.add('active');
+            refreshSimulation();
+        }
+
+        function updateDaySelector() {
+            const container = document.getElementById('day-selector-container');
+            const selector = document.getElementById('day-selector');
             
-            let soc = 50.0;
-            let socHist = [];
-            let gridHist = [];
-            let battHist = [];
-            let cost = 0, baseline = 0;
-            let batteryStatus = 'idle';
-
-            for (let h = 0; h < 24; h++) {
-                let isPeak = (h >= 17 && h <= 21);
-                let price = isPeak ? pHigh : pLow;
-                
-                // CRITICAL FIX: Include wind in renewable generation
-                let renewable = solar[h] + wind[h];
-                let net = renewable - load[h];
-                
-                // Calculate baseline cost (no battery, all from grid)
-                if (net < 0) baseline += Math.abs(net) * price;
-
-                let pGrid = 0, pBatt = 0;
-                
-                // Battery constraints
-                const socMin = cap * 0.10;  // 10% minimum
-                const socMax = cap * 0.95;  // 95% maximum
-                const socAvailable = soc - socMin;  // Energy available for discharge
-                const socRoom = socMax - soc;       // Room available for charge
-                
-                if (!gridActive) {
-                    // Islanded mode - use battery to balance
-                    if (net > 0) {
-                        // Surplus - charge battery if room available
-                        pBatt = Math.min(net, socRoom);
-                    } else {
-                        // Deficit - discharge battery if energy available
-                        pBatt = Math.max(net, -socAvailable);
-                    }
-                    pGrid = 0;
-                } else {
-                    // Grid-connected mode - optimize economically
-                    if (isPeak && net < 0) {
-                        // Peak hours with deficit - discharge battery if available
-                        pBatt = Math.max(net, -socAvailable);
-                    } else if (net > 0) {
-                        // Surplus - charge battery if room available
-                        pBatt = Math.min(net, socRoom);
-                    } else {
-                        pBatt = 0;
-                    }
-                    pGrid = -(net - pBatt);
+            if (numDays > 1) {
+                container.classList.remove('hidden');
+                selector.innerHTML = '';
+                for (let i = 0; i < numDays; i++) {
+                    const btn = document.createElement('button');
+                    btn.className = `day-btn ${i === currentDay ? 'active' : ''}`;
+                    btn.textContent = `Day ${i + 1}`;
+                    btn.onclick = () => selectDay(i);
+                    selector.appendChild(btn);
                 }
+            } else {
+                container.classList.add('hidden');
+                currentDay = 0;
+            }
+        }
 
-                // CRITICAL FIX: Apply battery efficiency and update SOC with proper limits
-                let socChange = pBatt > 0 ? pBatt * eff : pBatt / eff;
-                let newSoc = soc + socChange;
+        function selectDay(day) {
+            currentDay = day;
+            updateDaySelector();
+            updateChartsForDay(currentDay);
+        }
+
+        function updateChartsForDay(day) {
+            if (allDaysData[day]) {
+                const d = allDaysData[day];
                 
-                // Enforce hard limits
-                newSoc = Math.max(socMin, Math.min(socMax, newSoc));
-                socChange = newSoc - soc;
-                soc = newSoc;
+                pChart.data.datasets[0].data = d.solar;
+                pChart.data.datasets[1].data = d.load;
+                pChart.data.datasets[2].data = d.gridHist;
+                pChart.update('none');
+
+                sChart.data.datasets[0].data = d.socHist;
+                sChart.update('none');
+
+                updateDecisionLog(d.decisions);
+            }
+        }
+
+        function generateDecisions(hourlyData) {
+            const decisions = [];
+            
+            for (let h = 0; h < hourlyData.length; h++) {
+                const data = hourlyData[h];
+                const hour = h;
+                const isPeak = (hour >= 17 && hour <= 21);
                 
-                socHist.push((soc / cap) * 100);
-                gridHist.push(pGrid);
-                battHist.push(pBatt);
-                cost += Math.max(0, pGrid) * price;
+                let action = '';
+                let reason = '';
                 
-                // Determine battery status
-                if (Math.abs(pBatt) < 0.5) batteryStatus = 'idle';
-                else if (pBatt > 0) batteryStatus = 'charging';
-                else batteryStatus = 'discharging';
+                if (Math.abs(data.battPower) < 0.5) {
+                    action = '⏸️ Battery Idle';
+                    reason = 'System balanced - no battery action needed';
+                } else if (data.battPower > 0) {
+                    action = '🔋 Charging Battery';
+                    if (data.surplus > 0) {
+                        reason = `Excess renewable energy available (${data.surplus.toFixed(1)} kW surplus)`;
+                    } else if (!isPeak) {
+                        reason = `Low electricity prices ($${data.price.toFixed(2)}/kWh) - opportunistic charging`;
+                    } else {
+                        reason = 'Preparing for upcoming peak demand';
+                    }
+                } else {
+                    action = '⚡ Discharging Battery';
+                    if (isPeak) {
+                        reason = `Peak pricing period ($${data.price.toFixed(2)}/kWh) - avoiding high grid costs`;
+                    } else if (data.deficit > 0) {
+                        reason = `High load demand (${data.deficit.toFixed(1)} kW deficit) - supporting grid`;
+                    } else if (!gridActive) {
+                        reason = 'Islanded mode - battery providing backup power';
+                    } else {
+                        reason = 'Optimizing energy arbitrage';
+                    }
+                }
+                
+                decisions.push({
+                    hour: h,
+                    action: action,
+                    reason: reason,
+                    soc: data.soc,
+                    battPower: data.battPower
+                });
             }
             
-            return { T, solar, wind, load, gridHist, socHist, battHist, cost, baseline, batteryStatus };
+            return decisions;
+        }
+
+        function updateDecisionLog(decisions) {
+            const logContainer = document.getElementById('decision-log');
+            logContainer.innerHTML = '';
+            
+            // Only show decisions where battery is active
+            const activeDecisions = decisions.filter(d => Math.abs(d.battPower) >= 0.5);
+            
+            if (activeDecisions.length === 0) {
+                logContainer.innerHTML = '<div class="text-xs text-slate-400 italic">No significant battery activity for this day</div>';
+                return;
+            }
+            
+            activeDecisions.forEach(decision => {
+                const item = document.createElement('div');
+                item.className = 'decision-item';
+                item.innerHTML = `
+                    <div class="decision-time">${decision.hour}:00 - ${decision.hour + 1}:00</div>
+                    <div class="decision-action">${decision.action} (${Math.abs(decision.battPower).toFixed(1)} kW)</div>
+                    <div class="decision-reason">${decision.reason}</div>
+                    <div class="mt-2 text-[10px] text-slate-500">SoC: ${decision.soc.toFixed(1)}%</div>
+                `;
+                logContainer.appendChild(item);
+            });
+        }
+
+        function toggleDecisionLog() {
+            decisionLogExpanded = !decisionLogExpanded;
+            const log = document.getElementById('decision-log');
+            const icon = document.getElementById('log-toggle-icon');
+            
+            if (decisionLogExpanded) {
+                log.style.maxHeight = '300px';
+                icon.className = 'fa-solid fa-chevron-down';
+            } else {
+                log.style.maxHeight = '0px';
+                log.style.overflow = 'hidden';
+                icon.className = 'fa-solid fa-chevron-up';
+            }
+        }
+
+        function calculateSimulation() {
+            allDaysData = [];
+            let runningCost = 0;
+            let runningBaseline = 0;
+            
+            for (let day = 0; day < numDays; day++) {
+                const T = Array.from({length: 24}, (_, i) => i);
+                const solVal = parseFloat(inputs.sol.value);
+                const wndVal = parseFloat(inputs.wnd.value);
+                const lodVal = parseFloat(inputs.lod.value);
+                const cap = parseFloat(inputs.bat.value);
+                const pHigh = 0.35;
+                const pLow = 0.12;
+                const eff = 0.95;
+
+                const pattern = weatherPatterns[weatherPattern];
+                
+                // Add day-to-day variation
+                const dayVariation = 1 + (Math.random() - 0.5) * pattern.variability;
+                
+                const solar = T.map(h => {
+                    const base = solVal * pattern.solarMultiplier * dayVariation;
+                    const hourVariation = 1 + (Math.random() - 0.5) * pattern.variability;
+                    return base * Math.exp(-Math.pow(h - 12, 2) / (2 * Math.pow(2.5, 2))) * hourVariation;
+                });
+                
+                const wind = T.map(h => {
+                    const base = wndVal * pattern.windMultiplier;
+                    const hourVariation = 1 + (Math.random() - 0.5) * pattern.variability;
+                    return base * (0.7 + 0.3 * Math.cos(h / 3)) * hourVariation;
+                });
+                
+                const load = T.map(h => {
+                    const base = lodVal * pattern.loadMultiplier;
+                    const hourVariation = 1 + (Math.random() - 0.5) * 0.1;
+                    return base * (1 + 0.8 * Math.exp(-Math.pow(h - 19, 2) / 5) + 0.5 * Math.exp(-Math.pow(h - 8, 2) / 3)) * hourVariation;
+                });
+                
+                let soc = day === 0 ? 50.0 : allDaysData[day - 1].finalSoc;
+                let socHist = [];
+                let gridHist = [];
+                let battHist = [];
+                let cost = 0, baseline = 0;
+                let batteryStatus = 'idle';
+                let hourlyData = [];
+
+                for (let h = 0; h < 24; h++) {
+                    let isPeak = (h >= 17 && h <= 21);
+                    let price = isPeak ? pHigh : pLow;
+                    
+                    let renewable = solar[h] + wind[h];
+                    let net = renewable - load[h];
+                    
+                    if (net < 0) baseline += Math.abs(net) * price;
+
+                    let pGrid = 0, pBatt = 0;
+                    
+                    const socMin = cap * 0.10;
+                    const socMax = cap * 0.95;
+                    const socAvailable = soc - socMin;
+                    const socRoom = socMax - soc;
+                    
+                    if (!gridActive) {
+                        if (net > 0) {
+                            pBatt = Math.min(net, socRoom);
+                        } else {
+                            pBatt = Math.max(net, -socAvailable);
+                        }
+                        pGrid = 0;
+                    } else {
+                        if (isPeak && net < 0) {
+                            pBatt = Math.max(net, -socAvailable);
+                        } else if (net > 0) {
+                            pBatt = Math.min(net, socRoom);
+                        } else {
+                            pBatt = 0;
+                        }
+                        pGrid = -(net - pBatt);
+                    }
+
+                    let socChange = pBatt > 0 ? pBatt * eff : pBatt / eff;
+                    let newSoc = soc + socChange;
+                    
+                    newSoc = Math.max(socMin, Math.min(socMax, newSoc));
+                    socChange = newSoc - soc;
+                    soc = newSoc;
+                    
+                    socHist.push((soc / cap) * 100);
+                    gridHist.push(pGrid);
+                    battHist.push(pBatt);
+                    cost += Math.max(0, pGrid) * price;
+                    
+                    hourlyData.push({
+                        hour: h,
+                        battPower: pBatt,
+                        soc: (soc / cap) * 100,
+                        price: price,
+                        surplus: Math.max(0, net),
+                        deficit: Math.max(0, -net)
+                    });
+                    
+                    if (Math.abs(pBatt) < 0.5) batteryStatus = 'idle';
+                    else if (pBatt > 0) batteryStatus = 'charging';
+                    else batteryStatus = 'discharging';
+                }
+                
+                const decisions = generateDecisions(hourlyData);
+                
+                allDaysData.push({ 
+                    T, solar, wind, load, gridHist, socHist, battHist, 
+                    cost, baseline, batteryStatus, finalSoc: soc,
+                    decisions
+                });
+                
+                runningCost += cost;
+                runningBaseline += baseline;
+            }
+            
+            return { 
+                ...allDaysData[currentDay], 
+                totalCost: runningCost, 
+                totalBaseline: runningBaseline 
+            };
         }
 
         function refreshSimulation() {
@@ -1046,11 +1590,12 @@
             view.vWnd.innerText = inputs.wnd.value + "%";
             view.vLod.innerText = inputs.lod.value + " kW";
             view.vBat.innerText = inputs.bat.value + " kWh";
-            view.statCost.innerText = `$${d.cost.toFixed(2)}`;
-            view.statBaseline.innerText = `$${d.baseline.toFixed(2)}`;
+            view.vDays.innerText = numDays === 1 ? '1 Day' : `${numDays} Days`;
             
-            // CRITICAL FIX: Handle negative savings properly
-            const savings = d.baseline - d.cost;
+            view.statCost.innerText = `$${d.totalCost.toFixed(2)}`;
+            view.statBaseline.innerText = `$${d.totalBaseline.toFixed(2)}`;
+            
+            const savings = d.totalBaseline - d.totalCost;
             if (savings >= 0) {
                 view.statSavings.innerText = `$${savings.toFixed(2)}`;
                 view.statSavings.className = 'text-2xl font-bold text-emerald-600';
@@ -1059,7 +1604,6 @@
                 view.statSavings.className = 'text-2xl font-bold text-rose-600';
             }
 
-            // Update battery status indicator
             const batteryStatusEl = document.getElementById('battery-status-indicator');
             if (d.batteryStatus === 'charging') {
                 batteryStatusEl.className = 'battery-status battery-charging';
@@ -1078,13 +1622,17 @@
                 view.statusPill.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-500"></i> ISLANDED MODE`;
             }
 
-            pChart.data.datasets[0].data = d.solar;
-            pChart.data.datasets[1].data = d.load;
-            pChart.data.datasets[2].data = d.gridHist;
-            pChart.update('none');
+            updateDaySelector();
+            updateChartsForDay(currentDay);
+            updateDecisionLog(d.decisions);
+        }
 
-            sChart.data.datasets[0].data = d.socHist;
-            sChart.update('none');
+        function resetZoom(chartType) {
+            if (chartType === 'power') {
+                pChart.resetZoom();
+            } else if (chartType === 'soc') {
+                sChart.resetZoom();
+            }
         }
 
         function initSimulation() {
@@ -1102,7 +1650,24 @@
                 options: { 
                     responsive: true, 
                     maintainAspectRatio: false, 
-                    plugins: { legend: { display: false } },
+                    plugins: { 
+                        legend: { display: false },
+                        zoom: {
+                            pan: {
+                                enabled: true,
+                                mode: 'x'
+                            },
+                            zoom: {
+                                wheel: {
+                                    enabled: true,
+                                },
+                                pinch: {
+                                    enabled: true
+                                },
+                                mode: 'x'
+                            }
+                        }
+                    },
                     scales: { 
                         y: { 
                             grid: { color: '#f1f5f9' }, 
@@ -1136,7 +1701,24 @@
                 options: { 
                     responsive: true, 
                     maintainAspectRatio: false, 
-                    plugins: { legend: { display: false } },
+                    plugins: { 
+                        legend: { display: false },
+                        zoom: {
+                            pan: {
+                                enabled: true,
+                                mode: 'x'
+                            },
+                            zoom: {
+                                wheel: {
+                                    enabled: true,
+                                },
+                                pinch: {
+                                    enabled: true
+                                },
+                                mode: 'x'
+                            }
+                        }
+                    },
                     scales: { 
                         y: { 
                             min: 0, 
@@ -1162,26 +1744,56 @@
                 }
             });
 
+            // Add swipe gesture support
+            const chartContainers = document.querySelectorAll('.chart-container-mobile');
+            chartContainers.forEach(container => {
+                const hammer = new Hammer(container);
+                hammer.on('swipeleft', () => {
+                    if (currentDay < numDays - 1) {
+                        selectDay(currentDay + 1);
+                        showSwipeIndicator(`Day ${currentDay + 1}`);
+                    }
+                });
+                hammer.on('swiperight', () => {
+                    if (currentDay > 0) {
+                        selectDay(currentDay - 1);
+                        showSwipeIndicator(`Day ${currentDay + 1}`);
+                    }
+                });
+            });
+
             Object.values(inputs).forEach(i => i.addEventListener('input', refreshSimulation));
+            
+            inputs.days.addEventListener('input', (e) => {
+                numDays = parseInt(e.target.value);
+                currentDay = 0;
+                refreshSimulation();
+            });
+
             document.getElementById('btn-grid').onclick = () => { gridActive = !gridActive; refreshSimulation(); };
             document.getElementById('btn-storm').onclick = () => { 
                 inputs.sol.value = 5; 
-                inputs.wnd.value = 85;  // CRITICAL FIX: Increase wind during storm
+                inputs.wnd.value = 85;
                 gridActive = false; 
-                refreshSimulation(); 
+                selectWeather('rainy');
             };
             document.getElementById('btn-reset').onclick = () => { 
-                inputs.sol.value = 60; inputs.wnd.value = 30; inputs.lod.value = 50; inputs.bat.value = 200;
-                gridActive = true; refreshSimulation(); 
+                inputs.sol.value = 60; 
+                inputs.wnd.value = 30; 
+                inputs.lod.value = 50; 
+                inputs.bat.value = 200;
+                inputs.days.value = 1;
+                numDays = 1;
+                currentDay = 0;
+                gridActive = true; 
+                selectWeather('typical');
             };
             
-            // Export functionality
             document.getElementById('btn-export').onclick = exportData;
             
             refreshSimulation();
         }
 
-        // Preset scenarios
         function applyPreset(scenario) {
             switch(scenario) {
                 case 'sunny':
@@ -1189,53 +1801,63 @@
                     inputs.wnd.value = 20;
                     inputs.lod.value = 50;
                     gridActive = true;
+                    selectWeather('typical');
                     break;
                 case 'cloudy':
                     inputs.sol.value = 25;
                     inputs.wnd.value = 60;
                     inputs.lod.value = 50;
                     gridActive = true;
+                    selectWeather('intermittent');
                     break;
                 case 'highdemand':
                     inputs.sol.value = 60;
                     inputs.wnd.value = 30;
                     inputs.lod.value = 120;
                     gridActive = true;
+                    selectWeather('heatwave');
                     break;
                 case 'night':
                     inputs.sol.value = 0;
                     inputs.wnd.value = 45;
                     inputs.lod.value = 70;
                     gridActive = true;
+                    selectWeather('typical');
                     break;
             }
             refreshSimulation();
         }
 
-        // Export simulation data
         function exportData() {
-            const d = calculateSimulation();
             const csvContent = [
-                ['Hour', 'Solar (kW)', 'Wind (kW)', 'Load (kW)', 'Grid (kW)', 'Battery SoC (%)'],
-                ...d.T.map((h, i) => [
-                    h, 
-                    d.solar[i].toFixed(2), 
-                    d.wind[i].toFixed(2),
-                    d.load[i].toFixed(2), 
-                    d.gridHist[i].toFixed(2), 
-                    d.socHist[i].toFixed(2)
-                ])
+                ['Day', 'Hour', 'Solar (kW)', 'Wind (kW)', 'Load (kW)', 'Grid (kW)', 'Battery SoC (%)'],
+                ...allDaysData.flatMap((dayData, dayIndex) => 
+                    dayData.T.map((h, i) => [
+                        dayIndex + 1,
+                        h, 
+                        dayData.solar[i].toFixed(2), 
+                        dayData.wind[i].toFixed(2),
+                        dayData.load[i].toFixed(2), 
+                        dayData.gridHist[i].toFixed(2), 
+                        dayData.socHist[i].toFixed(2)
+                    ])
+                )
             ].map(row => row.join(',')).join('\n');
             
             const blob = new Blob([csvContent], { type: 'text/csv' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `heti-simulation-${new Date().toISOString().slice(0,10)}.csv`;
+            a.download = `heti-simulation-${numDays}days-${new Date().toISOString().slice(0,10)}.csv`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
+        }
+
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('mobile-sidebar');
+            sidebar.classList.toggle('collapsed-mobile');
         }
 
         window.onload = initSimulation;
