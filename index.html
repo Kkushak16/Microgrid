@@ -255,7 +255,6 @@ html, body {
 
 /* Z-Index */
 .z-50 { z-index: 50; }
-.z-100 { z-index: 100; }
 
 /* Display */
 .hidden { display: none; }
@@ -749,23 +748,10 @@ html, body {
         @media (max-width: 768px) {
             /* Mobile header improvements */
             header {
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
                 height: auto;
                 padding: 12px 16px;
                 flex-wrap: wrap;
                 gap: 12px;
-                z-index: 100;
-                background-color: #ffffff;
-                transform: translateY(0);
-                transition: transform 0.3s ease-in-out;
-            }
-            
-            /* Add padding to main content to account for fixed header */
-            main {
-                padding-top: 0;
             }
             
             header nav {
@@ -1101,7 +1087,7 @@ html, body {
     <div class="toast" id="toast"></div>
 
     <!-- Header -->
-    <header class="h-16 border-b bg-white flex items-center justify-between px-6 shrink-0 z-100" style="background-color: #ffffff;">
+    <header class="h-16 border-b bg-white flex items-center justify-between px-6 shrink-0 z-50" style="background-color: #ffffff;">
         <div class="flex items-center gap-3">
             <div class="w-8 h-8 bg-black rounded flex items-center justify-center text-white font-bold">H</div>
             <div>
@@ -2497,50 +2483,6 @@ html, body {
                     }
                 });
             });
-            
-            // Auto-hide header on scroll down, show on scroll up (mobile only)
-            let lastScrollTop = 0;
-            let scrollTimeout;
-            const header = document.querySelector('header');
-            const mainContent = document.querySelector('main');
-            
-            function handleScroll() {
-                // Only apply on mobile
-                if (window.innerWidth > 768) return;
-                
-                const scrollableElements = document.querySelectorAll('#section-concept, #section-simulation');
-                
-                scrollableElements.forEach(element => {
-                    if (element.scrollTop !== undefined) {
-                        const scrollTop = element.scrollTop;
-                        
-                        clearTimeout(scrollTimeout);
-                        scrollTimeout = setTimeout(() => {
-                            if (scrollTop > lastScrollTop && scrollTop > 50) {
-                                // Scrolling down & past threshold
-                                header.style.transform = 'translateY(-100%)';
-                                header.style.transition = 'transform 0.3s ease-in-out';
-                            } else if (scrollTop < lastScrollTop) {
-                                // Scrolling up
-                                header.style.transform = 'translateY(0)';
-                                header.style.transition = 'transform 0.3s ease-in-out';
-                            }
-                            lastScrollTop = scrollTop;
-                        }, 100);
-                    }
-                });
-            }
-            
-            // Attach scroll listeners to scrollable sections
-            const conceptSection = document.getElementById('section-concept');
-            const simulationSection = document.getElementById('section-simulation');
-            
-            if (conceptSection) {
-                conceptSection.addEventListener('scroll', handleScroll);
-            }
-            if (simulationSection) {
-                simulationSection.addEventListener('scroll', handleScroll);
-            }
         };
     </script>
 </body>
