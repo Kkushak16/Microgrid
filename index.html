@@ -4,10 +4,299 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Heti | Monitoring Environment</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind utility classes replaced with inline CSS for production -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1"></script>
     <style>
+/* Reset and base styles */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
+
+/* Layout */
+.flex { display: flex; }
+.inline-flex { display: inline-flex; }
+.flex-col { flex-direction: column; }
+.flex-1 { flex: 1 1 0%; }
+.flex-shrink-0 { flex-shrink: 0; }
+.shrink-0 { flex-shrink: 0; }
+.items-center { align-items: center; }
+.items-start { align-items: flex-start; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+
+/* Grid */
+.grid { display: grid; }
+.grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+.grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+/* Gap */
+.gap-1 { gap: 0.25rem; }
+.gap-2 { gap: 0.5rem; }
+.gap-3 { gap: 0.75rem; }
+.gap-4 { gap: 1rem; }
+.gap-6 { gap: 1.5rem; }
+.gap-8 { gap: 2rem; }
+.gap-10 { gap: 2.5rem; }
+.gap-12 { gap: 3rem; }
+.gap-x-12 { column-gap: 3rem; }
+.gap-y-6 { row-gap: 1.5rem; }
+
+/* Spacing - Height */
+.h-full { height: 100%; }
+.h-screen { height: 100vh; }
+.h-1\.5 { height: 0.375rem; }
+.h-2 { height: 0.5rem; }
+.h-8 { height: 2rem; }
+.h-10 { height: 2.5rem; }
+.h-16 { height: 4rem; }
+.h-\[400px\] { height: 400px; }
+.min-h-0 { min-height: 0; }
+
+/* Spacing - Width */
+.w-1\.5 { width: 0.375rem; }
+.w-2 { width: 0.5rem; }
+.w-8 { width: 2rem; }
+.w-10 { width: 2.5rem; }
+.w-80 { width: 20rem; }
+.w-full { width: 100%; }
+.max-w-5xl { max-width: 64rem; }
+
+/* Padding */
+.p-4 { padding: 1rem; }
+.p-5 { padding: 1.25rem; }
+.p-6 { padding: 1.5rem; }
+.p-8 { padding: 2rem; }
+.p-12 { padding: 3rem; }
+.px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+.px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+.px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+.py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+.py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+.py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+.pb-6 { padding-bottom: 1.5rem; }
+.pb-8 { padding-bottom: 2rem; }
+.pt-4 { padding-top: 1rem; }
+.pt-10 { padding-top: 2.5rem; }
+.pt-16 { padding-top: 4rem; }
+
+/* Margin */
+.m-0 { margin: 0; }
+.mx-auto { margin-left: auto; margin-right: auto; }
+.mb-1 { margin-bottom: 0.25rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+.mb-4 { margin-bottom: 1rem; }
+.mb-6 { margin-bottom: 1.5rem; }
+.mb-8 { margin-bottom: 2rem; }
+.mb-10 { margin-bottom: 2.5rem; }
+.mb-12 { margin-bottom: 3rem; }
+.mt-1 { margin-top: 0.25rem; }
+.mt-1\.5 { margin-top: 0.375rem; }
+.mt-2 { margin-top: 0.5rem; }
+.mt-6 { margin-top: 1.5rem; }
+.mt-8 { margin-top: 2rem; }
+.mt-10 { margin-top: 2.5rem; }
+
+/* Space Between */
+.space-y-1 > * + * { margin-top: 0.25rem; }
+.space-y-2 > * + * { margin-top: 0.5rem; }
+.space-y-4 > * + * { margin-top: 1rem; }
+.space-y-6 > * + * { margin-top: 1.5rem; }
+.space-y-8 > * + * { margin-top: 2rem; }
+.space-y-12 > * + * { margin-top: 3rem; }
+.space-y-16 > * + * { margin-top: 4rem; }
+
+/* Typography */
+.text-xs { font-size: 0.75rem; line-height: 1rem; }
+.text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+.text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+.text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+.text-2xl { font-size: 1.5rem; line-height: 2rem; }
+.text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
+.text-\[10px\] { font-size: 10px; }
+.text-\[11px\] { font-size: 11px; }
+
+.font-bold { font-weight: 700; }
+.font-semibold { font-weight: 600; }
+.font-medium { font-weight: 500; }
+.font-extrabold { font-weight: 800; }
+.font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+
+.uppercase { text-transform: uppercase; }
+.tracking-tight { letter-spacing: -0.025em; }
+.tracking-wider { letter-spacing: 0.05em; }
+.tracking-widest { letter-spacing: 0.1em; }
+.leading-relaxed { line-height: 1.625; }
+
+.text-left { text-align: left; }
+.text-center { text-align: center; }
+.italic { font-style: italic; }
+.whitespace-nowrap { white-space: nowrap; }
+
+/* Text Colors */
+.text-white { color: #ffffff; }
+.text-gray-400 { color: #9ca3af; }
+.text-slate-200 { color: #e2e8f0; }
+.text-slate-300 { color: #cbd5e1; }
+.text-slate-400 { color: #94a3b8; }
+.text-slate-500 { color: #64748b; }
+.text-slate-600 { color: #475569; }
+.text-slate-700 { color: #334155; }
+.text-slate-800 { color: #1e293b; }
+.text-slate-900 { color: #0f172a; }
+.text-amber-400 { color: #fbbf24; }
+.text-amber-500 { color: #f59e0b; }
+.text-amber-600 { color: #d97706; }
+.text-amber-700 { color: #b45309; }
+.text-amber-800 { color: #92400e; }
+.text-blue-400 { color: #60a5fa; }
+.text-blue-600 { color: #2563eb; }
+.text-blue-800 { color: #1e40af; }
+.text-rose-400 { color: #fb7185; }
+.text-rose-500 { color: #f43f5e; }
+.text-rose-600 { color: #e11d48; }
+.text-rose-700 { color: #be123c; }
+.text-violet-600 { color: #7c3aed; }
+.text-indigo-400 { color: #818cf8; }
+.text-indigo-600 { color: #4f46e5; }
+.text-indigo-700 { color: #4338ca; }
+.text-emerald-50 { color: #ecfdf5; }
+.text-emerald-400 { color: #34d399; }
+.text-emerald-500 { color: #10b981; }
+.text-emerald-600 { color: #059669; }
+.text-emerald-700 { color: #047857; }
+.text-emerald-800 { color: #065f46; }
+
+/* Background Colors */
+.bg-white { background-color: #ffffff; }
+.bg-black { background-color: #000000; }
+.bg-slate-50 { background-color: #f8fafc; }
+.bg-slate-100 { background-color: #f1f5f9; }
+.bg-slate-400 { background-color: #94a3b8; }
+.bg-slate-500 { background-color: #64748b; }
+.bg-slate-800 { background-color: #1e293b; }
+.bg-slate-900 { background-color: #0f172a; }
+.bg-amber-50 { background-color: #fffbeb; }
+.bg-amber-100 { background-color: #fef3c7; }
+.bg-blue-50 { background-color: #eff6ff; }
+.bg-blue-100 { background-color: #dbeafe; }
+.bg-rose-100 { background-color: #ffe4e6; }
+.bg-violet-100 { background-color: #ede9fe; }
+.bg-indigo-100 { background-color: #e0e7ff; }
+.bg-emerald-50 { background-color: #ecfdf5; }
+.bg-emerald-100 { background-color: #d1fae5; }
+.bg-white\/10 { background-color: rgba(255, 255, 255, 0.1); }
+
+/* Gradients */
+.bg-gradient-to-r { background-image: linear-gradient(to right, var(--tw-gradient-stops)); }
+.bg-gradient-to-br { background-image: linear-gradient(to bottom right, var(--tw-gradient-stops)); }
+.from-slate-50 { --tw-gradient-from: #f8fafc; --tw-gradient-to: rgba(248, 250, 252, 0); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
+.from-emerald-500 { --tw-gradient-from: #10b981; --tw-gradient-to: rgba(16, 185, 129, 0); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
+.to-blue-50 { --tw-gradient-to: #eff6ff; }
+.to-teal-500 { --tw-gradient-to: #14b8a6; }
+
+/* Borders */
+.border { border-width: 1px; border-style: solid; border-color: #e2e8f0; }
+.border-b { border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #e2e8f0; }
+.border-t { border-top-width: 1px; border-top-style: solid; border-top-color: #e2e8f0; }
+.border-r { border-right-width: 1px; border-right-style: solid; border-right-color: #e2e8f0; }
+.border-2 { border-width: 2px; }
+.border-l-4 { border-left-width: 4px; }
+.border-slate-200 { border-color: #e2e8f0; }
+.border-slate-400 { border-color: #94a3b8; }
+.border-amber-100 { border-color: #fef3c7; }
+.border-blue-100 { border-color: #dbeafe; }
+.border-rose-200 { border-color: #fecdd3; }
+.border-emerald-100 { border-color: #d1fae5; }
+.border-l-blue-500 { border-left-color: #3b82f6; }
+.border-l-violet-500 { border-left-color: #8b5cf6; }
+.border-l-emerald-500 { border-left-color: #10b981; }
+
+/* Divide */
+.divide-y > * + * { border-top-width: 1px; }
+.divide-slate-100 > * + * { border-color: #f1f5f9; }
+
+/* Border Radius */
+.rounded { border-radius: 0.25rem; }
+.rounded-lg { border-radius: 0.5rem; }
+.rounded-xl { border-radius: 0.75rem; }
+.rounded-2xl { border-radius: 1rem; }
+.rounded-3xl { border-radius: 1.5rem; }
+.rounded-full { border-radius: 9999px; }
+
+/* Shadows */
+.shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+.shadow-xl { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
+
+/* Effects */
+.opacity-75 { opacity: 0.75; }
+.backdrop-blur-sm { backdrop-filter: blur(4px); }
+
+/* Overflow */
+.overflow-hidden { overflow: hidden; }
+.overflow-x-hidden { overflow-x: hidden; }
+.overflow-x-auto { overflow-x: auto; }
+.overflow-y-auto { overflow-y: auto; }
+
+/* Position */
+.relative { position: relative; }
+.absolute { position: absolute; }
+.fixed { position: fixed; }
+
+/* Z-Index */
+.z-50 { z-index: 50; }
+.z-100 { z-index: 100; }
+
+/* Display */
+.hidden { display: none; }
+
+/* Lists */
+.list-disc { list-style-type: disc; }
+.list-inside { list-style-position: inside; }
+
+/* Transitions */
+.transition { 
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter; 
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); 
+    transition-duration: 150ms; 
+}
+
+/* Hover States */
+.hover\:text-gray-600:hover { color: #4b5563; }
+.hover\:bg-slate-50:hover { background-color: #f8fafc; }
+.hover\:bg-slate-800:hover { background-color: #1e293b; }
+.hover\:bg-slate-900:hover { background-color: #0f172a; }
+.hover\:bg-rose-50:hover { background-color: #fff1f2; }
+
+/* Animations */
+.animate-ping {
+    animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes ping {
+    75%, 100% {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+
+/* Responsive Design */
+@media (min-width: 768px) {
+    .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
         body {
@@ -49,6 +338,7 @@
         .tab-active {
             color: #000 !important;
             border-bottom: 2px solid #000;
+            background: transparent !important;
         }
 
         .hidden-section {
@@ -457,6 +747,72 @@
 
         /* Mobile responsiveness */
         @media (max-width: 768px) {
+            /* Mobile header improvements */
+            header {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: auto;
+                padding: 12px 16px;
+                flex-wrap: wrap;
+                gap: 12px;
+                z-index: 100;
+                background-color: #ffffff;
+                transform: translateY(0);
+                transition: transform 0.3s ease-in-out;
+            }
+            
+            /* Add padding to main content to account for fixed header */
+            main {
+                padding-top: 0;
+            }
+            
+            header nav {
+                order: 3;
+                width: 100%;
+                border-top: 1px solid #f1f5f9;
+                padding-top: 8px;
+                gap: 0;
+                justify-content: space-around;
+            }
+            
+            header nav button {
+                flex: 1;
+                padding: 12px 16px;
+                border: none !important;
+                background: transparent !important;
+                border-radius: 0;
+                position: relative;
+            }
+            
+            header nav button.tab-active {
+                background: transparent !important;
+                border-bottom: 3px solid #000 !important;
+                color: #000;
+            }
+            
+            header nav button:not(.tab-active) {
+                border-bottom: 3px solid transparent !important;
+                color: #9ca3af;
+            }
+            
+            header nav button:hover {
+                background: transparent !important;
+            }
+            
+            /* Hide some header elements on mobile */
+            #battery-status-indicator,
+            #status-pill,
+            .tooltip-container {
+                display: none;
+            }
+            
+            #btn-help {
+                padding: 8px 12px;
+                font-size: 11px;
+            }
+            
             aside {
                 position: fixed;
                 top: 0;
@@ -495,7 +851,9 @@
             
             /* Mobile hamburger button */
             .mobile-menu-btn {
-                display: block;
+                display: flex;
+                align-items: center;
+                justify-content: center;
                 position: fixed;
                 bottom: 24px;
                 right: 24px;
@@ -539,9 +897,15 @@
                 font-size: 1.75rem;
             }
             
-            /* Make charts taller on mobile */
+            /* Make charts taller on mobile and enable touch interactions */
             #pwrChart, #socChart {
-                min-height: 250px !important;
+                min-height: 300px !important;
+                touch-action: pan-y pinch-zoom;
+            }
+            
+            .chart-container-mobile {
+                touch-action: pan-y pinch-zoom;
+                overflow: hidden;
             }
             
             /* Improve button tap targets */
@@ -560,12 +924,18 @@
             input[type="range"] {
                 height: 12px;
                 padding: 8px 0;
+                min-height: 44px;
             }
             
             /* Mobile tab improvements */
             .tab-button {
                 padding: 14px 18px;
                 font-size: 14px;
+            }
+            
+            /* Better spacing for mobile content */
+            main {
+                padding-top: 8px;
             }
         }
         
@@ -590,6 +960,26 @@
         
         .mobile-toggle-btn {
             display: none;
+        }
+        
+        /* Touch hints - only show on mobile */
+        .touch-hint {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .touch-hint {
+                display: block;
+            }
+        }
+        
+        /* Ensure mobile menu button is visible on mobile */
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
+            }
         }
     </style>
 </head>
@@ -711,7 +1101,7 @@
     <div class="toast" id="toast"></div>
 
     <!-- Header -->
-    <header class="h-16 border-b bg-white flex items-center justify-between px-6 shrink-0 z-50">
+    <header class="h-16 border-b bg-white flex items-center justify-between px-6 shrink-0 z-100" style="background-color: #ffffff;">
         <div class="flex items-center gap-3">
             <div class="w-8 h-8 bg-black rounded flex items-center justify-center text-white font-bold">H</div>
             <div>
@@ -720,11 +1110,11 @@
         </div>
         
         <!-- Navigation Tabs -->
-        <nav class="flex h-full gap-8">
-            <button onclick="switchTab('concept')" id="tab-concept" class="h-full px-2 text-xs font-bold uppercase tracking-widest transition tab-active">
+        <nav class="flex h-full gap-8" style="background: transparent;">
+            <button onclick="switchTab('concept')" id="tab-concept" class="h-full px-2 text-xs font-bold uppercase tracking-widest transition tab-active" style="background: transparent; border: none; outline: none;">
                 Concept
             </button>
-            <button onclick="switchTab('simulation')" id="tab-simulation" class="h-full px-2 text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-gray-600 transition">
+            <button onclick="switchTab('simulation')" id="tab-simulation" class="h-full px-2 text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-gray-600 transition" style="background: transparent; border: none; outline: none;">
                 Simulation
             </button>
         </nav>
@@ -1233,25 +1623,41 @@
                     <div class="grid grid-cols-1 gap-6">
                         <div class="h-[400px] chart-container-mobile glass-panel p-6 rounded-2xl flex flex-col">
                             <div class="flex justify-between items-center mb-4 shrink-0">
-                                <h3 class="text-sm font-bold">Power Dispatch Profile (24h)</h3>
-                                <div class="flex gap-4 text-[10px] font-bold">
-                                    <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-amber-500"></i> SOLAR</span>
-                                    <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-rose-500"></i> LOAD</span>
-                                    <span class="flex items-center gap-1"><i class="fa-solid fa-square text-blue-400"></i> GRID</span>
+                                <div>
+                                    <h3 class="text-sm font-bold">Power Dispatch Profile (24h)</h3>
+                                    <div class="flex gap-4 text-[10px] font-bold mt-1">
+                                        <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-amber-500"></i> SOLAR</span>
+                                        <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-rose-500"></i> LOAD</span>
+                                        <span class="flex items-center gap-1"><i class="fa-solid fa-square text-blue-400"></i> GRID</span>
+                                    </div>
                                 </div>
+                                <button onclick="pChart.resetZoom()" class="px-3 py-1 text-xs bg-slate-100 hover:bg-slate-200 rounded-lg transition font-semibold shrink-0" title="Reset zoom">
+                                    <i class="fa-solid fa-maximize"></i>
+                                </button>
                             </div>
                             <div class="flex-1 min-h-0 relative">
                                 <canvas id="pwrChart"></canvas>
+                                <div class="touch-hint" style="position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #94a3b8; pointer-events: none; opacity: 0.7;">
+                                    👆 Pinch to zoom • Swipe to pan
+                                </div>
                             </div>
                         </div>
 
                         <div class="h-[400px] chart-container-mobile glass-panel p-6 rounded-2xl flex flex-col">
                             <div class="flex justify-between items-center mb-4 shrink-0">
-                                <h3 class="text-lg font-extrabold text-slate-800">Battery State of Charge (%)</h3>
-                                <div class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded">STORAGE CAPACITY MONITOR</div>
+                                <div>
+                                    <h3 class="text-lg font-extrabold text-slate-800">Battery State of Charge (%)</h3>
+                                    <div class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded inline-block mt-1">STORAGE CAPACITY MONITOR</div>
+                                </div>
+                                <button onclick="sChart.resetZoom()" class="px-3 py-1 text-xs bg-slate-100 hover:bg-slate-200 rounded-lg transition font-semibold shrink-0" title="Reset zoom">
+                                    <i class="fa-solid fa-maximize"></i>
+                                </button>
                             </div>
                             <div class="flex-1 min-h-0 relative">
                                 <canvas id="socChart"></canvas>
+                                <div class="touch-hint" style="position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #94a3b8; pointer-events: none; opacity: 0.7;">
+                                    👆 Pinch to zoom • Swipe to pan
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1627,7 +2033,26 @@
                                     size: 11
                                 }
                             }
-                        } 
+                        },
+                        zoom: {
+                            pan: {
+                                enabled: true,
+                                mode: 'x',
+                                modifierKey: null,
+                            },
+                            zoom: {
+                                wheel: {
+                                    enabled: false,
+                                },
+                                pinch: {
+                                    enabled: true,
+                                },
+                                mode: 'x',
+                            },
+                            limits: {
+                                x: {min: 'original', max: 'original'},
+                            }
+                        }
                     },
                     scales: { 
                         y: { 
@@ -1673,7 +2098,26 @@
                                     size: 11
                                 }
                             }
-                        } 
+                        },
+                        zoom: {
+                            pan: {
+                                enabled: true,
+                                mode: 'x',
+                                modifierKey: null,
+                            },
+                            zoom: {
+                                wheel: {
+                                    enabled: false,
+                                },
+                                pinch: {
+                                    enabled: true,
+                                },
+                                mode: 'x',
+                            },
+                            limits: {
+                                x: {min: 'original', max: 'original'},
+                            }
+                        }
                     },
                     scales: { 
                         y: { 
@@ -2053,6 +2497,50 @@
                     }
                 });
             });
+            
+            // Auto-hide header on scroll down, show on scroll up (mobile only)
+            let lastScrollTop = 0;
+            let scrollTimeout;
+            const header = document.querySelector('header');
+            const mainContent = document.querySelector('main');
+            
+            function handleScroll() {
+                // Only apply on mobile
+                if (window.innerWidth > 768) return;
+                
+                const scrollableElements = document.querySelectorAll('#section-concept, #section-simulation');
+                
+                scrollableElements.forEach(element => {
+                    if (element.scrollTop !== undefined) {
+                        const scrollTop = element.scrollTop;
+                        
+                        clearTimeout(scrollTimeout);
+                        scrollTimeout = setTimeout(() => {
+                            if (scrollTop > lastScrollTop && scrollTop > 50) {
+                                // Scrolling down & past threshold
+                                header.style.transform = 'translateY(-100%)';
+                                header.style.transition = 'transform 0.3s ease-in-out';
+                            } else if (scrollTop < lastScrollTop) {
+                                // Scrolling up
+                                header.style.transform = 'translateY(0)';
+                                header.style.transition = 'transform 0.3s ease-in-out';
+                            }
+                            lastScrollTop = scrollTop;
+                        }, 100);
+                    }
+                });
+            }
+            
+            // Attach scroll listeners to scrollable sections
+            const conceptSection = document.getElementById('section-concept');
+            const simulationSection = document.getElementById('section-simulation');
+            
+            if (conceptSection) {
+                conceptSection.addEventListener('scroll', handleScroll);
+            }
+            if (simulationSection) {
+                simulationSection.addEventListener('scroll', handleScroll);
+            }
         };
     </script>
 </body>
