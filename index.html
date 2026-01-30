@@ -7,8 +7,7 @@
     <!-- Tailwind utility classes replaced with inline CSS for production -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
     <style>
 /* Reset and base styles */
 *, *::before, *::after {
@@ -20,6 +19,7 @@
 html, body {
     height: 100%;
     overflow: hidden;
+    font-size: 16px; /* Base font size increased for better readability */
 }
 
 /* Layout */
@@ -116,15 +116,15 @@ html, body {
 .space-y-12 > * + * { margin-top: 3rem; }
 .space-y-16 > * + * { margin-top: 4rem; }
 
-/* Typography */
-.text-xs { font-size: 0.75rem; line-height: 1rem; }
-.text-sm { font-size: 0.875rem; line-height: 1.25rem; }
-.text-lg { font-size: 1.125rem; line-height: 1.75rem; }
-.text-xl { font-size: 1.25rem; line-height: 1.75rem; }
-.text-2xl { font-size: 1.5rem; line-height: 2rem; }
-.text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
-.text-\[10px\] { font-size: 10px; }
-.text-\[11px\] { font-size: 11px; }
+/* Typography - INCREASED FONT SIZES */
+.text-xs { font-size: 0.9rem; line-height: 1.4rem; } /* Increased from 0.875rem */
+.text-sm { font-size: 1.05rem; line-height: 1.6rem; } /* Increased from 1rem */
+.text-lg { font-size: 1.35rem; line-height: 2rem; } /* Increased from 1.25rem */
+.text-xl { font-size: 1.5rem; line-height: 2rem; } /* Increased from 1.375rem */
+.text-2xl { font-size: 1.75rem; line-height: 2.5rem; } /* Increased from 1.625rem */
+.text-4xl { font-size: 2.75rem; line-height: 3rem; } /* Increased from 2.5rem */
+.text-\[10px\] { font-size: 14px; } /* Increased from 13px */
+.text-\[11px\] { font-size: 15px; } /* Increased from 14px */
 
 .font-bold { font-weight: 700; }
 .font-semibold { font-weight: 600; }
@@ -136,7 +136,7 @@ html, body {
 .tracking-tight { letter-spacing: -0.025em; }
 .tracking-wider { letter-spacing: 0.05em; }
 .tracking-widest { letter-spacing: 0.1em; }
-.leading-relaxed { line-height: 1.625; }
+.leading-relaxed { line-height: 1.75; }
 
 .text-left { text-align: left; }
 .text-center { text-align: center; }
@@ -336,8 +336,6 @@ html, body {
 
         .tab-active {
             color: #000 !important;
-            border-bottom: 2px solid #000;
-            background: transparent !important;
         }
 
         .hidden-section {
@@ -347,12 +345,13 @@ html, body {
         .formula-box {
             background: #f1f5f9;
             border-left: 4px solid #000;
-            padding: 1rem;
+            padding: 1.25rem 1.5rem;
             font-family: 'Inter', sans-serif;
             font-weight: 600;
-            font-size: 0.875rem;
+            font-size: 1rem;
             margin: 1rem 0;
             border-radius: 0 0.5rem 0.5rem 0;
+            line-height: 1.6;
         }
         
         .concept-card {
@@ -361,13 +360,18 @@ html, body {
             border-radius: 1rem;
             background: #fff;
         }
+        
+        .concept-card p {
+            font-size: 15px;
+            line-height: 1.7;
+        }
 
         .physics-tag {
             background: #e2e8f0;
             color: #475569;
-            padding: 2px 6px;
+            padding: 4px 8px;
             border-radius: 4px;
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
         }
@@ -389,8 +393,8 @@ html, body {
         }
 
         table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 12px; font-size: 11px; color: #64748b; border-bottom: 2px solid #f1f5f9; text-transform: uppercase; }
-        td { padding: 12px; font-size: 13px; border-bottom: 1px solid #f1f5f9; }
+        th { text-align: left; padding: 12px; font-size: 13px; color: #64748b; border-bottom: 2px solid #f1f5f9; text-transform: uppercase; font-weight: 700; }
+        td { padding: 12px; font-size: 15px; border-bottom: 1px solid #f1f5f9; line-height: 1.6; }
 
         /* Tooltip styles - now works on mobile with tap */
         .tooltip-container {
@@ -714,15 +718,17 @@ html, body {
 
         /* Preset buttons */
         .preset-btn {
-            padding: 8px 12px;
+            padding: 12px 16px;
             border-radius: 8px;
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
             cursor: pointer;
             transition: all 0.2s;
             border: 1px solid #e2e8f0;
             background: white;
+            min-height: 44px;
+            touch-action: manipulation;
         }
         .preset-btn:hover {
             background: #f8fafc;
@@ -746,59 +752,6 @@ html, body {
 
         /* Mobile responsiveness */
         @media (max-width: 768px) {
-            /* Mobile header improvements */
-            header {
-                height: auto;
-                padding: 12px 16px;
-                flex-wrap: wrap;
-                gap: 12px;
-            }
-            
-            header nav {
-                order: 3;
-                width: 100%;
-                border-top: 1px solid #f1f5f9;
-                padding-top: 8px;
-                gap: 0;
-                justify-content: space-around;
-            }
-            
-            header nav button {
-                flex: 1;
-                padding: 12px 16px;
-                border: none !important;
-                background: transparent !important;
-                border-radius: 0;
-                position: relative;
-            }
-            
-            header nav button.tab-active {
-                background: transparent !important;
-                border-bottom: 3px solid #000 !important;
-                color: #000;
-            }
-            
-            header nav button:not(.tab-active) {
-                border-bottom: 3px solid transparent !important;
-                color: #9ca3af;
-            }
-            
-            header nav button:hover {
-                background: transparent !important;
-            }
-            
-            /* Hide some header elements on mobile */
-            #battery-status-indicator,
-            #status-pill,
-            .tooltip-container {
-                display: none;
-            }
-            
-            #btn-help {
-                padding: 8px 12px;
-                font-size: 11px;
-            }
-            
             aside {
                 position: fixed;
                 top: 0;
@@ -860,6 +813,42 @@ html, body {
                 transform: scale(0.95);
             }
             
+            /* Mobile header improvements */
+            header {
+                padding-left: 12px !important;
+                padding-right: 12px !important;
+            }
+            
+            header .flex.items-center.gap-3 {
+                gap: 10px !important;
+            }
+            
+            header nav {
+                gap: 20px !important;
+            }
+            
+            header nav button {
+                font-size: 10px !important;
+                padding-left: 10px !important;
+                padding-right: 10px !important;
+            }
+            
+            #status-pill {
+                font-size: 9px !important;
+                padding: 5px 8px !important;
+                white-space: nowrap;
+            }
+            
+            .battery-status {
+                font-size: 9px !important;
+                padding: 5px 8px !important;
+            }
+            
+            #btn-help {
+                font-size: 9px !important;
+                padding: 5px 8px !important;
+            }
+            
             /* Increase font sizes for mobile */
             body {
                 font-size: 16px;
@@ -883,15 +872,9 @@ html, body {
                 font-size: 1.75rem;
             }
             
-            /* Make charts taller on mobile and enable touch interactions */
+            /* Make charts taller on mobile */
             #pwrChart, #socChart {
-                min-height: 300px !important;
-                touch-action: pan-y pinch-zoom;
-            }
-            
-            .chart-container-mobile {
-                touch-action: pan-y pinch-zoom;
-                overflow: hidden;
+                min-height: 250px !important;
             }
             
             /* Improve button tap targets */
@@ -910,18 +893,12 @@ html, body {
             input[type="range"] {
                 height: 12px;
                 padding: 8px 0;
-                min-height: 44px;
             }
             
             /* Mobile tab improvements */
             .tab-button {
                 padding: 14px 18px;
                 font-size: 14px;
-            }
-            
-            /* Better spacing for mobile content */
-            main {
-                padding-top: 8px;
             }
         }
         
@@ -948,23 +925,27 @@ html, body {
             display: none;
         }
         
-        /* Touch hints - only show on mobile */
-        .touch-hint {
-            display: none;
-        }
-        
-        @media (max-width: 768px) {
-            .touch-hint {
-                display: block;
-            }
-        }
-        
         /* Ensure mobile menu button is visible on mobile */
         @media (max-width: 768px) {
             .mobile-menu-btn {
                 display: flex !important;
                 align-items: center;
                 justify-content: center;
+            }
+        }
+        
+        /* Very small screens - additional optimizations */
+        @media (max-width: 480px) {
+            .battery-status {
+                display: none !important;
+            }
+            
+            #btn-help span {
+                display: none;
+            }
+            
+            #btn-help {
+                padding: 8px !important;
             }
         }
     </style>
@@ -1087,7 +1068,7 @@ html, body {
     <div class="toast" id="toast"></div>
 
     <!-- Header -->
-    <header class="h-16 border-b bg-white flex items-center justify-between px-6 shrink-0 z-50" style="background-color: #ffffff;">
+    <header class="h-16 bg-white flex items-center justify-between px-6 shrink-0 z-50">
         <div class="flex items-center gap-3">
             <div class="w-8 h-8 bg-black rounded flex items-center justify-center text-white font-bold">H</div>
             <div>
@@ -1096,11 +1077,11 @@ html, body {
         </div>
         
         <!-- Navigation Tabs -->
-        <nav class="flex h-full gap-8" style="background: transparent;">
-            <button onclick="switchTab('concept')" id="tab-concept" class="h-full px-2 text-xs font-bold uppercase tracking-widest transition tab-active" style="background: transparent; border: none; outline: none;">
+        <nav class="flex h-full gap-8">
+            <button onclick="switchTab('concept')" id="tab-concept" class="h-full px-4 text-xs font-bold uppercase tracking-widest transition tab-active">
                 Concept
             </button>
-            <button onclick="switchTab('simulation')" id="tab-simulation" class="h-full px-2 text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-gray-600 transition" style="background: transparent; border: none; outline: none;">
+            <button onclick="switchTab('simulation')" id="tab-simulation" class="h-full px-4 text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-gray-600 transition">
                 Simulation
             </button>
         </nav>
@@ -1110,16 +1091,12 @@ html, body {
                 <i class="fa-solid fa-battery-half"></i>
                 <span>IDLE</span>
             </div>
-            <div class="tooltip-container">
-                <div id="status-pill" class="px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold flex items-center gap-2">
-                    <span class="relative flex h-2 w-2">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-slate-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2 w-2 bg-slate-500"></span>
-                    </span>
-                    SYSTEM READY
-                </div>
-                <span class="tooltip-icon"><i class="fa-solid fa-circle-info"></i></span>
-                <span class="tooltip-text">System status indicator. "Islanded mode" means the microgrid is operating independently without grid connection.</span>
+            <div id="status-pill" class="px-3 py-1 rounded-full text-[10px] font-bold flex items-center gap-2" style="background-color: #10b981; color: white;">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                </span>
+                SYSTEM ONLINE
             </div>
             <button id="btn-help" onclick="startTutorial()" class="px-3 py-1 rounded-lg border-2 border-slate-200 text-slate-600 text-[10px] font-bold uppercase tracking-wider hover:bg-slate-50 transition" title="Start tutorial">
                 <i class="fa-solid fa-circle-question"></i> Help
@@ -1273,7 +1250,7 @@ html, body {
                             <h4 class="text-emerald-400 font-bold mb-4 uppercase tracking-widest text-xs">The Objective Function</h4>
                             <p class="text-lg text-slate-200 mb-6 font-semibold text-center py-4">Total Cost = Fuel Cost + Grid Power Cost + Battery Wear Penalty</p>
                             <p class="text-sm text-slate-300 leading-relaxed">
-                                <b>Logic Example:</b> If the <b>Battery Wear Penalty</b> (degradation cost) is $0.15/kWh, and the <b>Grid Power Cost</b> is $0.20/kWh, the engine will decide to discharge. If the grid price drops to $0.05/kWh, the engine stops discharging and starts charging from the grid instead.
+                                <b>Logic Example:</b> If the <b>Battery Wear Penalty</b> (degradation cost) is ₹12.50/kWh, and the <b>Grid Power Cost</b> is ₹16.60/kWh, the engine will decide to discharge. If the grid price drops to ₹4.15/kWh, the engine stops discharging and starts charging from the grid instead.
                             </p>
                         </div>
 
@@ -1588,15 +1565,15 @@ html, body {
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 shrink-0 stats-grid-mobile">
                         <div class="glass-panel p-5 rounded-2xl stat-card stat-card-mobile">
                             <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Operational Cost</p>
-                            <p id="stat-cost" class="text-2xl font-bold">$0.00</p>
+                            <p id="stat-cost" class="text-2xl font-bold">₹0.00</p>
                         </div>
                         <div class="glass-panel p-5 rounded-2xl stat-card stat-card-mobile">
-                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Baseline Comparison</p>
-                            <p id="stat-baseline" class="text-2xl font-bold text-slate-400">$0.00</p>
+                            <p class="text-[10px] font-bold text-rose-600 uppercase tracking-widest mb-1">Baseline Comparison</p>
+                            <p id="stat-baseline" class="text-2xl font-bold text-rose-600">₹0.00</p>
                         </div>
                         <div class="glass-panel p-5 rounded-2xl stat-card stat-card-mobile border-l-4 border-l-emerald-500">
                             <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-1">Total Savings</p>
-                            <p id="stat-savings" class="text-2xl font-bold text-emerald-600">$0.00</p>
+                            <p id="stat-savings" class="text-2xl font-bold text-emerald-600">₹0.00</p>
                         </div>
                     </div>
 
@@ -1609,41 +1586,25 @@ html, body {
                     <div class="grid grid-cols-1 gap-6">
                         <div class="h-[400px] chart-container-mobile glass-panel p-6 rounded-2xl flex flex-col">
                             <div class="flex justify-between items-center mb-4 shrink-0">
-                                <div>
-                                    <h3 class="text-sm font-bold">Power Dispatch Profile (24h)</h3>
-                                    <div class="flex gap-4 text-[10px] font-bold mt-1">
-                                        <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-amber-500"></i> SOLAR</span>
-                                        <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-rose-500"></i> LOAD</span>
-                                        <span class="flex items-center gap-1"><i class="fa-solid fa-square text-blue-400"></i> GRID</span>
-                                    </div>
+                                <h3 class="text-sm font-bold">Power Dispatch Profile (24h)</h3>
+                                <div class="flex gap-4 text-[10px] font-bold">
+                                    <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-amber-500"></i> SOLAR</span>
+                                    <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-rose-500"></i> LOAD</span>
+                                    <span class="flex items-center gap-1"><i class="fa-solid fa-square text-blue-400"></i> GRID</span>
                                 </div>
-                                <button onclick="pChart.resetZoom()" class="px-3 py-1 text-xs bg-slate-100 hover:bg-slate-200 rounded-lg transition font-semibold shrink-0" title="Reset zoom">
-                                    <i class="fa-solid fa-maximize"></i>
-                                </button>
                             </div>
                             <div class="flex-1 min-h-0 relative">
                                 <canvas id="pwrChart"></canvas>
-                                <div class="touch-hint" style="position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #94a3b8; pointer-events: none; opacity: 0.7;">
-                                    👆 Pinch to zoom • Swipe to pan
-                                </div>
                             </div>
                         </div>
 
                         <div class="h-[400px] chart-container-mobile glass-panel p-6 rounded-2xl flex flex-col">
                             <div class="flex justify-between items-center mb-4 shrink-0">
-                                <div>
-                                    <h3 class="text-lg font-extrabold text-slate-800">Battery State of Charge (%)</h3>
-                                    <div class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded inline-block mt-1">STORAGE CAPACITY MONITOR</div>
-                                </div>
-                                <button onclick="sChart.resetZoom()" class="px-3 py-1 text-xs bg-slate-100 hover:bg-slate-200 rounded-lg transition font-semibold shrink-0" title="Reset zoom">
-                                    <i class="fa-solid fa-maximize"></i>
-                                </button>
+                                <h3 class="text-lg font-extrabold text-slate-800">Battery State of Charge (%)</h3>
+                                <div class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded">STORAGE CAPACITY MONITOR</div>
                             </div>
                             <div class="flex-1 min-h-0 relative">
                                 <canvas id="socChart"></canvas>
-                                <div class="touch-hint" style="position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #94a3b8; pointer-events: none; opacity: 0.7;">
-                                    👆 Pinch to zoom • Swipe to pan
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -1949,8 +1910,8 @@ html, body {
             view.vWnd.innerText = inputs.wnd.value + "%";
             view.vLod.innerText = inputs.lod.value + " kW";
             view.vBat.innerText = inputs.bat.value + " kWh";
-            view.statCost.innerText = `$${d.cost.toFixed(2)}`;
-            view.statBaseline.innerText = `$${d.baseline.toFixed(2)}`;
+            view.statCost.innerText = `₹${d.cost.toFixed(2)}`;
+            view.statBaseline.innerText = `₹${d.baseline.toFixed(2)}`;
             
             // Enable continue button during onboarding
             enableContinueButton();
@@ -1958,10 +1919,10 @@ html, body {
             // CRITICAL FIX: Handle negative savings properly
             const savings = d.baseline - d.cost;
             if (savings >= 0) {
-                view.statSavings.innerText = `$${savings.toFixed(2)}`;
+                view.statSavings.innerText = `₹${savings.toFixed(2)}`;
                 view.statSavings.className = 'text-2xl font-bold text-emerald-600';
             } else {
-                view.statSavings.innerText = `-$${Math.abs(savings).toFixed(2)}`;
+                view.statSavings.innerText = `-₹${Math.abs(savings).toFixed(2)}`;
                 view.statSavings.className = 'text-2xl font-bold text-rose-600';
             }
 
@@ -1979,9 +1940,11 @@ html, body {
             }
 
             if(gridActive) {
-                view.statusPill.innerHTML = `<span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-slate-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-slate-500"></span></span> SYSTEM ONLINE`;
+                view.statusPill.innerHTML = `<span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span></span> SYSTEM ONLINE`;
+                view.statusPill.className = 'px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 text-[10px] font-bold flex items-center gap-2';
             } else {
                 view.statusPill.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-500"></i> ISLANDED MODE`;
+                view.statusPill.className = 'px-3 py-1 rounded-full bg-rose-50 text-rose-600 text-[10px] font-bold flex items-center gap-2';
             }
 
             pChart.data.datasets[0].data = d.solar;
@@ -2019,26 +1982,7 @@ html, body {
                                     size: 11
                                 }
                             }
-                        },
-                        zoom: {
-                            pan: {
-                                enabled: true,
-                                mode: 'x',
-                                modifierKey: null,
-                            },
-                            zoom: {
-                                wheel: {
-                                    enabled: false,
-                                },
-                                pinch: {
-                                    enabled: true,
-                                },
-                                mode: 'x',
-                            },
-                            limits: {
-                                x: {min: 'original', max: 'original'},
-                            }
-                        }
+                        } 
                     },
                     scales: { 
                         y: { 
@@ -2084,26 +2028,7 @@ html, body {
                                     size: 11
                                 }
                             }
-                        },
-                        zoom: {
-                            pan: {
-                                enabled: true,
-                                mode: 'x',
-                                modifierKey: null,
-                            },
-                            zoom: {
-                                wheel: {
-                                    enabled: false,
-                                },
-                                pinch: {
-                                    enabled: true,
-                                },
-                                mode: 'x',
-                            },
-                            limits: {
-                                x: {min: 'original', max: 'original'},
-                            }
-                        }
+                        } 
                     },
                     scales: { 
                         y: { 
