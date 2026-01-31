@@ -7,7 +7,6 @@
     <!-- Tailwind utility classes replaced with inline CSS for production -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
     <style>
 /* Reset and base styles */
 *, *::before, *::after {
@@ -117,14 +116,14 @@ html, body {
 .space-y-16 > * + * { margin-top: 4rem; }
 
 /* Typography - INCREASED FONT SIZES */
-.text-xs { font-size: 0.9rem; line-height: 1.4rem; } /* Increased from 0.875rem */
-.text-sm { font-size: 1.05rem; line-height: 1.6rem; } /* Increased from 1rem */
-.text-lg { font-size: 1.35rem; line-height: 2rem; } /* Increased from 1.25rem */
-.text-xl { font-size: 1.5rem; line-height: 2rem; } /* Increased from 1.375rem */
-.text-2xl { font-size: 1.75rem; line-height: 2.5rem; } /* Increased from 1.625rem */
-.text-4xl { font-size: 2.75rem; line-height: 3rem; } /* Increased from 2.5rem */
-.text-\[10px\] { font-size: 14px; } /* Increased from 13px */
-.text-\[11px\] { font-size: 15px; } /* Increased from 14px */
+.text-xs { font-size: 0.875rem; line-height: 1.25rem; } /* Increased from 0.75rem */
+.text-sm { font-size: 1rem; line-height: 1.5rem; } /* Increased from 0.875rem */
+.text-lg { font-size: 1.25rem; line-height: 1.875rem; } /* Increased from 1.125rem */
+.text-xl { font-size: 1.375rem; line-height: 1.875rem; } /* Increased from 1.25rem */
+.text-2xl { font-size: 1.625rem; line-height: 2.25rem; } /* Increased from 1.5rem */
+.text-4xl { font-size: 2.5rem; line-height: 2.75rem; } /* Increased from 2.25rem */
+.text-\[10px\] { font-size: 13px; } /* Increased from 10px */
+.text-\[11px\] { font-size: 14px; } /* Increased from 11px */
 
 .font-bold { font-weight: 700; }
 .font-semibold { font-weight: 600; }
@@ -136,7 +135,7 @@ html, body {
 .tracking-tight { letter-spacing: -0.025em; }
 .tracking-wider { letter-spacing: 0.05em; }
 .tracking-widest { letter-spacing: 0.1em; }
-.leading-relaxed { line-height: 1.75; }
+.leading-relaxed { line-height: 1.625; }
 
 .text-left { text-align: left; }
 .text-center { text-align: center; }
@@ -336,6 +335,7 @@ html, body {
 
         .tab-active {
             color: #000 !important;
+            border-bottom: 2px solid #000;
         }
 
         .hidden-section {
@@ -345,13 +345,12 @@ html, body {
         .formula-box {
             background: #f1f5f9;
             border-left: 4px solid #000;
-            padding: 1.25rem 1.5rem;
+            padding: 1rem;
             font-family: 'Inter', sans-serif;
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 0.875rem;
             margin: 1rem 0;
             border-radius: 0 0.5rem 0.5rem 0;
-            line-height: 1.6;
         }
         
         .concept-card {
@@ -360,18 +359,13 @@ html, body {
             border-radius: 1rem;
             background: #fff;
         }
-        
-        .concept-card p {
-            font-size: 15px;
-            line-height: 1.7;
-        }
 
         .physics-tag {
             background: #e2e8f0;
             color: #475569;
-            padding: 4px 8px;
+            padding: 2px 6px;
             border-radius: 4px;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
             text-transform: uppercase;
         }
@@ -393,8 +387,8 @@ html, body {
         }
 
         table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 12px; font-size: 13px; color: #64748b; border-bottom: 2px solid #f1f5f9; text-transform: uppercase; font-weight: 700; }
-        td { padding: 12px; font-size: 15px; border-bottom: 1px solid #f1f5f9; line-height: 1.6; }
+        th { text-align: left; padding: 12px; font-size: 11px; color: #64748b; border-bottom: 2px solid #f1f5f9; text-transform: uppercase; }
+        td { padding: 12px; font-size: 13px; border-bottom: 1px solid #f1f5f9; }
 
         /* Tooltip styles - now works on mobile with tap */
         .tooltip-container {
@@ -411,31 +405,19 @@ html, body {
         .tooltip-text {
             visibility: hidden;
             width: 220px;
+            max-width: 90vw;
             background-color: #1e293b;
             color: #fff;
             text-align: left;
             border-radius: 8px;
             padding: 10px 14px;
-            position: absolute;
-            z-index: 1000;
-            bottom: 125%;
-            left: 50%;
-            margin-left: -110px;
+            position: fixed;
+            z-index: 10001;
             opacity: 0;
             transition: opacity 0.3s;
             font-size: 13px;
             line-height: 1.5;
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-        }
-        .tooltip-text::after {
-            content: "";
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            margin-left: -5px;
-            border-width: 5px;
-            border-style: solid;
-            border-color: #1e293b transparent transparent transparent;
         }
         .tooltip-container:hover .tooltip-text,
         .tooltip-container.active .tooltip-text {
@@ -473,6 +455,84 @@ html, body {
         
         .toast.error {
             background: #dc2626;
+        }
+        
+        /* Mobile parameters indicator */
+        .mobile-params-indicator {
+            display: none;
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            background: linear-gradient(135deg, #000 0%, #1e293b 100%);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 10004;
+            max-width: 200px;
+            animation: slideInRight 0.4s ease, pulse 2s ease-in-out infinite;
+        }
+        
+        .mobile-params-indicator::after {
+            content: "";
+            position: absolute;
+            bottom: -8px;
+            right: 20px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid #1e293b;
+        }
+        
+        .mobile-params-indicator.show {
+            display: block;
+        }
+        
+        .mobile-params-indicator .close-indicator {
+            position: absolute;
+            top: 4px;
+            right: 6px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.02);
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .mobile-params-indicator {
+                display: none !important;
+            }
         }
         
         /* Onboarding Tutorial Overlay */
@@ -718,17 +778,15 @@ html, body {
 
         /* Preset buttons */
         .preset-btn {
-            padding: 12px 16px;
+            padding: 8px 12px;
             border-radius: 8px;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 600;
             text-transform: uppercase;
             cursor: pointer;
             transition: all 0.2s;
             border: 1px solid #e2e8f0;
             background: white;
-            min-height: 44px;
-            touch-action: manipulation;
         }
         .preset-btn:hover {
             background: #f8fafc;
@@ -813,40 +871,51 @@ html, body {
                 transform: scale(0.95);
             }
             
-            /* Mobile header improvements */
+            /* Fix header layout on mobile to prevent overlapping */
             header {
-                padding-left: 12px !important;
-                padding-right: 12px !important;
+                padding: 8px 12px;
+                height: auto;
+                min-height: 56px;
+                position: relative;
+                z-index: 100;
             }
             
             header .flex.items-center.gap-3 {
-                gap: 10px !important;
+                flex: 1;
             }
             
             header nav {
-                gap: 20px !important;
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+                gap: 16px;
             }
             
-            header nav button {
-                font-size: 10px !important;
-                padding-left: 10px !important;
-                padding-right: 10px !important;
+            header .flex.items-center.gap-4 {
+                display: flex !important;
+                flex-wrap: nowrap;
+                gap: 6px;
+                justify-content: flex-end;
             }
             
-            #status-pill {
-                font-size: 9px !important;
-                padding: 5px 8px !important;
+            #btn-help,
+            #btn-export {
+                display: inline-flex !important;
+                font-size: 9px;
+                padding: 6px 8px;
+                min-width: 60px;
+                height: 32px;
                 white-space: nowrap;
             }
             
-            .battery-status {
-                font-size: 9px !important;
-                padding: 5px 8px !important;
+            #btn-export.hidden {
+                display: none !important;
             }
             
-            #btn-help {
-                font-size: 9px !important;
-                padding: 5px 8px !important;
+            /* Ensure main content doesn't overlap with header */
+            main {
+                margin-top: 0;
+                height: calc(100vh - 56px);
             }
             
             /* Increase font sizes for mobile */
@@ -931,21 +1000,6 @@ html, body {
                 display: flex !important;
                 align-items: center;
                 justify-content: center;
-            }
-        }
-        
-        /* Very small screens - additional optimizations */
-        @media (max-width: 480px) {
-            .battery-status {
-                display: none !important;
-            }
-            
-            #btn-help span {
-                display: none;
-            }
-            
-            #btn-help {
-                padding: 8px !important;
             }
         }
     </style>
@@ -1066,9 +1120,18 @@ html, body {
     
     <!-- Toast notification -->
     <div class="toast" id="toast"></div>
+    
+    <!-- Mobile parameters indicator -->
+    <div class="mobile-params-indicator" id="mobile-params-indicator">
+        <button class="close-indicator" onclick="closeMobileIndicator()" aria-label="Close">×</button>
+        <div style="padding-right: 20px;">
+            <div style="font-size: 20px; margin-bottom: 6px;">👆</div>
+            <div>Tap the menu button to adjust simulation parameters!</div>
+        </div>
+    </div>
 
     <!-- Header -->
-    <header class="h-16 bg-white flex items-center justify-between px-6 shrink-0 z-50">
+    <header class="h-16 border-b bg-white flex items-center justify-between px-6 shrink-0 z-50">
         <div class="flex items-center gap-3">
             <div class="w-8 h-8 bg-black rounded flex items-center justify-center text-white font-bold">H</div>
             <div>
@@ -1078,30 +1141,16 @@ html, body {
         
         <!-- Navigation Tabs -->
         <nav class="flex h-full gap-8">
-            <button onclick="switchTab('concept')" id="tab-concept" class="h-full px-4 text-xs font-bold uppercase tracking-widest transition tab-active">
+            <button onclick="switchTab('concept')" id="tab-concept" class="h-full px-2 text-xs font-bold uppercase tracking-widest transition tab-active" style="background: white; border: none;">
                 Concept
             </button>
-            <button onclick="switchTab('simulation')" id="tab-simulation" class="h-full px-4 text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-gray-600 transition">
+            <button onclick="switchTab('simulation')" id="tab-simulation" class="h-full px-2 text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-gray-600 transition" style="background: white; border: none;">
                 Simulation
             </button>
         </nav>
 
         <div class="flex items-center gap-4">
-            <div id="battery-status-indicator" class="battery-status battery-idle">
-                <i class="fa-solid fa-battery-half"></i>
-                <span>IDLE</span>
-            </div>
-            <div id="status-pill" class="px-3 py-1 rounded-full text-[10px] font-bold flex items-center gap-2" style="background-color: #10b981; color: white;">
-                <span class="relative flex h-2 w-2">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
-                </span>
-                SYSTEM ONLINE
-            </div>
-            <button id="btn-help" onclick="startTutorial()" class="px-3 py-1 rounded-lg border-2 border-slate-200 text-slate-600 text-[10px] font-bold uppercase tracking-wider hover:bg-slate-50 transition" title="Start tutorial">
-                <i class="fa-solid fa-circle-question"></i> Help
-            </button>
-            <button id="btn-export" class="px-3 py-1 rounded-lg bg-black text-white text-[10px] font-bold uppercase tracking-wider hover:bg-slate-800 transition hidden">
+            <button id="btn-export" class="px-3 py-1 rounded-lg bg-black text-white text-[10px] font-bold uppercase tracking-wider hover:bg-slate-800 transition hidden" style="min-width: 90px; height: 36px;">
                 <i class="fa-solid fa-download"></i> Export
             </button>
         </div>
@@ -1788,6 +1837,11 @@ html, body {
                 exportBtn.classList.remove('hidden');
                 if (pChart) pChart.resize();
                 if (sChart) sChart.resize();
+                
+                // Show mobile indicator on first visit to simulation tab
+                if (window.innerWidth <= 768) {
+                    showMobileParamsIndicator();
+                }
             } else {
                 simSection.classList.add('hidden-section');
                 conSection.classList.remove('hidden-section');
@@ -1797,6 +1851,31 @@ html, body {
                 tabSim.classList.add('text-gray-400');
                 exportBtn.classList.add('hidden');
             }
+        }
+        
+        // Show mobile parameters indicator
+        function showMobileParamsIndicator() {
+            const indicator = document.getElementById('mobile-params-indicator');
+            const hasSeenIndicator = localStorage.getItem('hasSeenMobileParamsIndicator');
+            
+            if (!hasSeenIndicator) {
+                setTimeout(() => {
+                    indicator.classList.add('show');
+                    
+                    // Auto-hide after 8 seconds
+                    setTimeout(() => {
+                        indicator.classList.remove('show');
+                        localStorage.setItem('hasSeenMobileParamsIndicator', 'true');
+                    }, 8000);
+                }, 500);
+            }
+        }
+        
+        // Close mobile indicator
+        function closeMobileIndicator() {
+            const indicator = document.getElementById('mobile-params-indicator');
+            indicator.classList.remove('show');
+            localStorage.setItem('hasSeenMobileParamsIndicator', 'true');
         }
 
         const inputs = {
@@ -1813,8 +1892,7 @@ html, body {
             vBat: document.getElementById('v-bat'),
             statCost: document.getElementById('stat-cost'),
             statBaseline: document.getElementById('stat-baseline'),
-            statSavings: document.getElementById('stat-savings'),
-            statusPill: document.getElementById('status-pill')
+            statSavings: document.getElementById('stat-savings')
         };
 
         function calculateSimulation() {
@@ -1926,26 +2004,11 @@ html, body {
                 view.statSavings.className = 'text-2xl font-bold text-rose-600';
             }
 
-            // Update battery status indicator
-            const batteryStatusEl = document.getElementById('battery-status-indicator');
-            if (d.batteryStatus === 'charging') {
-                batteryStatusEl.className = 'battery-status battery-charging';
-                batteryStatusEl.innerHTML = '<i class="fa-solid fa-battery-three-quarters"></i><span>CHARGING</span>';
-            } else if (d.batteryStatus === 'discharging') {
-                batteryStatusEl.className = 'battery-status battery-discharging';
-                batteryStatusEl.innerHTML = '<i class="fa-solid fa-battery-quarter"></i><span>DISCHARGING</span>';
-            } else {
-                batteryStatusEl.className = 'battery-status battery-idle';
-                batteryStatusEl.innerHTML = '<i class="fa-solid fa-battery-half"></i><span>IDLE</span>';
-            }
+            // Battery status indicator removed from UI
 
-            if(gridActive) {
-                view.statusPill.innerHTML = `<span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span></span> SYSTEM ONLINE`;
-                view.statusPill.className = 'px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 text-[10px] font-bold flex items-center gap-2';
-            } else {
-                view.statusPill.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-500"></i> ISLANDED MODE`;
-                view.statusPill.className = 'px-3 py-1 rounded-full bg-rose-50 text-rose-600 text-[10px] font-bold flex items-center gap-2';
-            }
+
+            // Status pill removed from UI
+
 
             pChart.data.datasets[0].data = d.solar;
             pChart.data.datasets[1].data = d.load;
@@ -2356,6 +2419,7 @@ html, body {
             
             tooltips.forEach(container => {
                 const icon = container.querySelector('.tooltip-icon');
+                const tooltipText = container.querySelector('.tooltip-text');
                 
                 // Toggle on click/tap
                 icon.addEventListener('click', (e) => {
@@ -2370,6 +2434,16 @@ html, body {
                     
                     // Toggle this tooltip
                     container.classList.toggle('active');
+                    
+                    // Position tooltip within viewport
+                    if (container.classList.contains('active')) {
+                        positionTooltip(icon, tooltipText);
+                    }
+                });
+                
+                // Position on hover for desktop
+                icon.addEventListener('mouseenter', () => {
+                    positionTooltip(icon, tooltipText);
                 });
             });
             
@@ -2381,6 +2455,37 @@ html, body {
                     });
                 }
             });
+        }
+        
+        // Position tooltip to stay within viewport
+        function positionTooltip(icon, tooltipText) {
+            const iconRect = icon.getBoundingClientRect();
+            const tooltipWidth = 220;
+            const tooltipHeight = tooltipText.offsetHeight || 100;
+            const padding = 10;
+            
+            // Calculate initial position (centered above icon)
+            let left = iconRect.left + (iconRect.width / 2) - (tooltipWidth / 2);
+            let top = iconRect.top - tooltipHeight - padding;
+            
+            // Adjust if tooltip goes off left edge
+            if (left < padding) {
+                left = padding;
+            }
+            
+            // Adjust if tooltip goes off right edge
+            if (left + tooltipWidth > window.innerWidth - padding) {
+                left = window.innerWidth - tooltipWidth - padding;
+            }
+            
+            // If tooltip goes off top, show it below the icon instead
+            if (top < padding) {
+                top = iconRect.bottom + padding;
+            }
+            
+            // Apply position
+            tooltipText.style.left = left + 'px';
+            tooltipText.style.top = top + 'px';
         }
 
         window.onload = function() {
