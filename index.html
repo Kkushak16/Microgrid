@@ -18,7 +18,28 @@
 html, body {
     height: 100%;
     overflow: hidden;
-    font-size: 16px; /* Base font size increased for better readability */
+    font-size: 18px; /* Base font size increased from 16px for better readability */
+}
+
+/* Prevent text overflow globally */
+h1, h2, h3, h4, h5, h6, p, span, div {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+
+/* Paragraph base styles */
+p {
+    font-size: 1.125rem; /* 18px */
+    line-height: 1.75; /* Better line height for readability */
+}
+
+/* Specific text size overrides for smaller UI elements */
+.text-ui-small {
+    font-size: 0.875rem;
+}
+
+.text-ui-tiny {
+    font-size: 0.75rem;
 }
 
 /* Layout */
@@ -116,14 +137,14 @@ html, body {
 .space-y-16 > * + * { margin-top: 4rem; }
 
 /* Typography - INCREASED FONT SIZES */
-.text-xs { font-size: 0.875rem; line-height: 1.25rem; } /* Increased from 0.75rem */
-.text-sm { font-size: 1rem; line-height: 1.5rem; } /* Increased from 0.875rem */
-.text-lg { font-size: 1.25rem; line-height: 1.875rem; } /* Increased from 1.125rem */
-.text-xl { font-size: 1.375rem; line-height: 1.875rem; } /* Increased from 1.25rem */
-.text-2xl { font-size: 1.625rem; line-height: 2.25rem; } /* Increased from 1.5rem */
-.text-4xl { font-size: 2.5rem; line-height: 2.75rem; } /* Increased from 2.25rem */
-.text-\[10px\] { font-size: 13px; } /* Increased from 10px */
-.text-\[11px\] { font-size: 14px; } /* Increased from 11px */
+.text-xs { font-size: 1rem; line-height: 1.5rem; } /* Increased from 0.875rem */
+.text-sm { font-size: 1.125rem; line-height: 1.75rem; } /* Increased from 1rem */
+.text-lg { font-size: 1.375rem; line-height: 2rem; } /* Increased from 1.25rem */
+.text-xl { font-size: 1.5rem; line-height: 2rem; } /* Increased from 1.375rem */
+.text-2xl { font-size: 1.75rem; line-height: 2.5rem; } /* Increased from 1.625rem */
+.text-4xl { font-size: 2.75rem; line-height: 3rem; } /* Increased from 2.5rem */
+.text-\[10px\] { font-size: 14px; } /* Increased from 13px */
+.text-\[11px\] { font-size: 15px; } /* Increased from 14px */
 
 .font-bold { font-weight: 700; }
 .font-semibold { font-weight: 600; }
@@ -303,19 +324,148 @@ html, body {
             color: #1e293b;
         }
 
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(226, 232, 240, 0.8);
+        /* Animated environment background */
+        #env-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+        }
+        #env-canvas.visible {
+            opacity: 1;
         }
 
-        input[type="range"] {
-            accent-color: #000;
+        /* Zone indicator badge */
+        .zone-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 2px 7px;
+            border-radius: 20px;
+            margin-top: 4px;
+            transition: background 0.3s, color 0.3s;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+        .zone-badge .zone-dot {
+            width: 6px;
             height: 6px;
+            border-radius: 50%;
+        }
+        .zone-badge.optimal {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .zone-badge.optimal .zone-dot { background: #10b981; }
+        .zone-badge.warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .zone-badge.warning .zone-dot { background: #f59e0b; }
+        .zone-badge.critical {
+            background: #ffe4e6;
+            color: #be123c;
+        }
+        .zone-badge.critical .zone-dot { background: #f43f5e; }
+
+        /* Color-coded slider tracks via pseudo-element gradient fills */
+        .slider-wrap { 
+            position: relative;
+            display: flex;
+            align-items: center;
+            height: 24px;
+        }
+        .slider-wrap input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: transparent;
+            outline: none;
+            position: relative;
+            z-index: 1;
+            margin: 0;
+        }
+        .slider-wrap input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #1e293b;
+            cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 2;
+        }
+        .slider-wrap input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #1e293b;
+            cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            border: none;
+        }
+        /* The gradient track sits behind the native range input */
+        .slider-track {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 6px;
+            border-radius: 3px;
+            transform: translateY(-50%);
+            z-index: 0;
+            pointer-events: none;
+            transition: background 0.25s;
+            background: #e2e8f0;
+        }
+        /* Black fill showing slider progress */
+        .slider-fill {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            height: 6px;
+            border-radius: 3px;
+            transform: translateY(-50%);
+            z-index: 0;
+            pointer-events: none;
+            background: #000;
+            transition: width 0.15s ease;
+        }
+
+        /* On mobile touch targets keep working */
+        @media (max-width: 768px) {
+            .slider-wrap input[type="range"] {
+                height: 12px;
+                padding: 8px 0;
+            }
+            .slider-track {
+                height: 6px;
+            }
         }
 
         .stat-card {
             transition: transform 0.2s ease;
+            overflow: hidden;
+        }
+        
+        .stat-card p {
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .stat-card:hover {
@@ -351,6 +501,8 @@ html, body {
             font-size: 0.875rem;
             margin: 1rem 0;
             border-radius: 0 0.5rem 0.5rem 0;
+            overflow-x: auto;
+            word-wrap: break-word;
         }
         
         .concept-card {
@@ -358,6 +510,21 @@ html, body {
             padding: 1.5rem;
             border-radius: 1rem;
             background: #fff;
+        }
+        
+        /* Ensure Operational Theory subtitle stays within border */
+        #section-concept > div > header {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #section-concept > div > header h2 {
+            order: 1;
+        }
+        
+        #section-concept > div > header p {
+            order: 2;
+            margin-top: 0;
         }
 
         .physics-tag {
@@ -386,9 +553,9 @@ html, body {
             background: #cbd5e1;
         }
 
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 12px; font-size: 11px; color: #64748b; border-bottom: 2px solid #f1f5f9; text-transform: uppercase; }
-        td { padding: 12px; font-size: 13px; border-bottom: 1px solid #f1f5f9; }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        th { text-align: left; padding: 12px; font-size: 11px; color: #64748b; border-bottom: 2px solid #f1f5f9; text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; }
+        td { padding: 12px; font-size: 16px; border-bottom: 1px solid #f1f5f9; overflow: hidden; text-overflow: ellipsis; }
 
         /* Tooltip styles - now works on mobile with tap */
         .tooltip-container {
@@ -415,7 +582,7 @@ html, body {
             z-index: 10001;
             opacity: 0;
             transition: opacity 0.3s;
-            font-size: 13px;
+            font-size: 15px;
             line-height: 1.5;
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
@@ -435,7 +602,7 @@ html, body {
             color: white;
             padding: 14px 24px;
             border-radius: 8px;
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 500;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             z-index: 10000;
@@ -457,82 +624,94 @@ html, body {
             background: #dc2626;
         }
         
-        /* Mobile parameters indicator */
-        .mobile-params-indicator {
-            display: none;
+        /* ─── Mobile Preferences Popup (FAB hint) ─── */
+        .mobile-pref-popup {
+            display: none;                       /* hidden until .show */
             position: fixed;
-            bottom: 90px;
-            right: 20px;
-            background: linear-gradient(135deg, #000 0%, #1e293b 100%);
-            color: white;
-            padding: 12px 16px;
-            border-radius: 12px;
-            font-size: 13px;
-            font-weight: 600;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            z-index: 10004;
-            max-width: 200px;
-            animation: slideInRight 0.4s ease, pulse 2s ease-in-out infinite;
+            bottom: 94px;                        /* sit just above the FAB */
+            right: 24px;
+            z-index: 10005;
+            width: 200px;
         }
-        
-        .mobile-params-indicator::after {
+
+        .mobile-pref-popup.show {
+            display: block;
+            animation: popupSlideUp 0.35s cubic-bezier(.22,.68,0,1.2) forwards;
+        }
+
+        @keyframes popupSlideUp {
+            from { opacity: 0; transform: translateY(14px); }
+            to   { opacity: 1; transform: translateY(0);    }
+        }
+
+        /* The bubble card itself */
+        .mobile-pref-popup .bubble {
+            background: #1e293b;
+            color: #fff;
+            border-radius: 14px;
+            padding: 14px 15px 14px 14px;
+            font-size: 13.5px;
+            font-weight: 600;
+            line-height: 1.45;
+            box-shadow: 0 6px 20px rgba(0,0,0,.35);
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        /* Pointer arrow pointing down-right towards the FAB */
+        .mobile-pref-popup .bubble::after {
             content: "";
             position: absolute;
-            bottom: -8px;
-            right: 20px;
-            width: 0;
-            height: 0;
-            border-left: 8px solid transparent;
-            border-right: 8px solid transparent;
-            border-top: 8px solid #1e293b;
+            bottom: -9px;
+            right: 22px;
+            width: 0; height: 0;
+            border-left:  9px solid transparent;
+            border-right: 9px solid transparent;
+            border-top:   9px solid #1e293b;
         }
-        
-        .mobile-params-indicator.show {
-            display: block;
+
+        /* Gear icon circle */
+        .mobile-pref-popup .bubble .pop-icon {
+            width: 32px; height: 32px;
+            min-width: 32px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.12);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 15px;
         }
-        
-        .mobile-params-indicator .close-indicator {
+
+        /* Close × */
+        .mobile-pref-popup .bubble .pop-close {
             position: absolute;
-            top: 4px;
-            right: 6px;
-            background: rgba(255,255,255,0.2);
+            top: 6px; right: 7px;
+            background: rgba(255,255,255,.18);
             border: none;
-            color: white;
-            width: 20px;
-            height: 20px;
+            color: #fff;
+            width: 22px; height: 22px;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-size: 13px;
+            line-height: 22px;
+            text-align: center;
             padding: 0;
         }
-        
-        @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+
+        /* Subtle ring-pulse on the FAB while popup is visible */
+        .mobile-pref-popup.show ~ .mobile-menu-btn {
+            box-shadow: 0 0 0 0 rgba(30,41,59,.5);
+            animation: fabRing 1.8s ease-in-out 0.3s infinite;
         }
-        
-        @keyframes pulse {
-            0%, 100% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.02);
-            }
+        @keyframes fabRing {
+            0%   { box-shadow: 0 0 0 0   rgba(30,41,59,.5); }
+            70%  { box-shadow: 0 0 0 12px rgba(30,41,59,0); }
+            100% { box-shadow: 0 0 0 0   rgba(30,41,59,0); }
         }
-        
+
+        /* Only visible on mobile */
         @media (min-width: 769px) {
-            .mobile-params-indicator {
-                display: none !important;
-            }
+            .mobile-pref-popup { display: none !important; }
         }
         
         /* Onboarding Tutorial Overlay */
@@ -810,6 +989,68 @@ html, body {
 
         /* Mobile responsiveness */
         @media (max-width: 768px) {
+            /* Mobile fixes for concept section */
+            #concept-container {
+                padding: 1.5rem 1rem !important;
+            }
+            
+            /* Mobile styles for definition box */
+            #concept-container > div:first-child {
+                padding: 1.5rem !important;
+                margin-bottom: 2.5rem !important;
+            }
+            
+            #concept-container > div:first-child h2 {
+                font-size: 1.5rem !important;
+                margin-bottom: 0.75rem !important;
+            }
+            
+            #concept-container > div:first-child p {
+                font-size: 0.95rem !important;
+                line-height: 1.6 !important;
+            }
+            
+            /* Make tables horizontally scrollable on mobile */
+            .overflow-x-auto {
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch;
+                width: 100%;
+            }
+            
+            .overflow-x-auto table {
+                min-width: 800px;
+            }
+            
+            /* Ensure table cells don't wrap on mobile */
+            .overflow-x-auto table td,
+            .overflow-x-auto table th {
+                white-space: normal;
+                min-width: 150px;
+            }
+            
+            .overflow-x-auto table td:last-child {
+                min-width: 300px;
+            }
+            
+            /* Add scrollbar styling for better UX */
+            .overflow-x-auto::-webkit-scrollbar {
+                height: 8px;
+            }
+            
+            .overflow-x-auto::-webkit-scrollbar-track {
+                background: #f1f5f9;
+                border-radius: 4px;
+            }
+            
+            .overflow-x-auto::-webkit-scrollbar-thumb {
+                background: #cbd5e1;
+                border-radius: 4px;
+            }
+            
+            .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+                background: #94a3b8;
+            }
+            
             aside {
                 position: fixed;
                 top: 0;
@@ -862,7 +1103,7 @@ html, body {
                 border: none;
                 font-size: 20px;
                 cursor: pointer;
-                z-index: 10003;
+                z-index: 10004;
                 box-shadow: 0 4px 12px rgba(0,0,0,0.3);
                 transition: transform 0.2s ease;
             }
@@ -873,39 +1114,72 @@ html, body {
             
             /* Fix header layout on mobile to prevent overlapping */
             header {
-                padding: 8px 12px;
-                height: auto;
-                min-height: 56px;
-                position: relative;
+                padding: 6px 10px;
+                height: 48px;
+                min-height: 48px;
+                position: sticky;
+                top: 0;
                 z-index: 100;
-            }
-            
-            header .flex.items-center.gap-3 {
-                flex: 1;
-            }
-            
-            header nav {
-                position: absolute;
-                left: 50%;
-                transform: translateX(-50%);
-                gap: 16px;
-            }
-            
-            header .flex.items-center.gap-4 {
+                background: white;
+                border-bottom: 1px solid #e2e8f0;
                 display: flex !important;
-                flex-wrap: nowrap;
-                gap: 6px;
-                justify-content: flex-end;
+                align-items: center;
+                justify-content: space-between;
+                gap: 4px;
             }
             
-            #btn-help,
+            /* Make logo smaller and compact on mobile */
+            header > div:first-child {
+                flex: 0 0 auto;
+                gap: 6px !important;
+            }
+            
+            header .w-8.h-8 {
+                width: 28px !important;
+                height: 28px !important;
+                font-size: 14px;
+            }
+            
+            header h1 {
+                font-size: 15px !important;
+            }
+            
+            /* Navigation tabs - compact in center */
+            header nav {
+                flex: 0 0 auto;
+                display: flex !important;
+                gap: 8px !important;
+                height: 100% !important;
+                align-items: center;
+            }
+            
+            header nav button {
+                font-size: 9px !important;
+                padding: 4px 8px !important;
+                height: auto !important;
+                white-space: nowrap;
+                letter-spacing: 0.05em !important;
+            }
+            
+            /* Export button - compact on right */
+            header > div:last-child {
+                flex: 0 0 auto;
+            }
+            
             #btn-export {
                 display: inline-flex !important;
-                font-size: 9px;
-                padding: 6px 8px;
-                min-width: 60px;
-                height: 32px;
+                font-size: 8px !important;
+                padding: 4px 6px !important;
+                min-width: 45px !important;
+                height: 26px !important;
                 white-space: nowrap;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            #btn-export i {
+                font-size: 8px;
+                margin-right: 2px;
             }
             
             #btn-export.hidden {
@@ -915,21 +1189,26 @@ html, body {
             /* Ensure main content doesn't overlap with header */
             main {
                 margin-top: 0;
-                height: calc(100vh - 56px);
+                height: calc(100vh - 48px);
             }
             
             /* Increase font sizes for mobile */
             body {
-                font-size: 16px;
+                font-size: 18px;
+            }
+            
+            p {
+                font-size: 1.125rem;
+                line-height: 1.75;
             }
             
             th {
-                font-size: 13px;
+                font-size: 15px;
                 padding: 14px;
             }
             
             td {
-                font-size: 15px;
+                font-size: 17px;
                 padding: 14px;
             }
             
@@ -937,13 +1216,44 @@ html, body {
                 font-size: 13px;
             }
             
-            .stat-card .text-2xl {
-                font-size: 1.75rem;
+            /* ─── Side-by-side stat cards on mobile ─── */
+            .stats-grid-mobile {
+                display: flex !important;
+                flex-direction: row !important;
+                gap: 8px !important;
+                /* let cards shrink equally */
+            }
+            .stats-grid-mobile > .stat-card {
+                flex: 1 1 0;   /* equal width columns */
+                min-width: 0;  /* allow text to truncate if needed */
+            }
+            .stat-card-mobile {
+                padding: 10px 8px !important;
+            }
+            .stat-card-mobile p.text-2xl {
+                font-size: 1.35rem !important;
+                line-height: 1.3 !important;
+                white-space: nowrap;
+            }
+            .stat-card-mobile p[class*="text-[10px]"] {
+                font-size: 9.5px !important;
+                margin-bottom: 3px !important;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .stat-card-mobile .zone-badge {
+                font-size: 8px !important;
+                padding: 2px 6px !important;
             }
             
             /* Make charts taller on mobile */
+            .chart-container-mobile {
+                height: 450px !important;
+            }
+            
             #pwrChart, #socChart {
-                min-height: 250px !important;
+                min-height: 300px !important;
             }
             
             /* Improve button tap targets */
@@ -969,8 +1279,183 @@ html, body {
                 padding: 14px 18px;
                 font-size: 14px;
             }
+            
+            /* Mobile table improvements */
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            th {
+                font-size: 9px !important;
+                padding: 8px !important;
+            }
+            
+            td {
+                font-size: 12px !important;
+                padding: 8px !important;
+            }
+            
+            td .font-mono {
+                font-size: 10px !important;
+            }
+            
+            td span.px-3 {
+                font-size: 9px !important;
+                padding: 2px 6px !important;
+            }
+            
+            /* Concept page mobile adjustments */
+            .formula-box {
+                font-size: 0.75rem !important;
+                padding: 0.75rem !important;
+            }
+            
+            .concept-card {
+                padding: 1rem !important;
+            }
+            
+            .concept-card h4 {
+                font-size: 0.875rem !important;
+            }
+            
+            .concept-card p {
+                font-size: 0.75rem !important;
+            }
+            
+            /* Better wrapping for long words */
+            .font-mono {
+                word-break: break-all;
+            }
+            
+            /* Operational Theory section mobile fixes */
+            #section-concept > div {
+                padding: 1.5rem 1rem !important;
+            }
+            
+            /* Header with border - subtitle must be inside the border area */
+            #section-concept > div > header {
+                margin-bottom: 2.5rem !important;  /* Gap AFTER the border line */
+                padding-bottom: 1.25rem !important;  /* Space inside for subtitle */
+                position: static !important;
+                display: flex !important;
+                flex-direction: column !important;
+                border-bottom: 1px solid #e2e8f0 !important;
+            }
+            
+            #section-concept > div > header h2 {
+                font-size: 1.75rem !important;
+                margin-bottom: 0.75rem !important;
+                line-height: 1.2;
+                display: block !important;
+                width: 100%;
+            }
+            
+            #section-concept > div > header p {
+                font-size: 0.95rem !important;
+                line-height: 1.5;
+                display: block !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 100%;
+            }
+            
+            /* Section spacing between Solar, Wind, Load sections */
+            #section-concept .space-y-16 > * + * {
+                margin-top: 2.5rem !important;
+            }
+            
+            /* Ensure content scrolls normally - not sticky */
+            #section-concept {
+                position: relative !important;
+            }
+            
+            /* Mathematical equation mobile adjustment */
+            .bg-slate-800 .font-mono {
+                font-size: 0.65rem !important;
+            }
+            
+            /* Reduce heading sizes on mobile concept page */
+            h2.text-2xl {
+                font-size: 1.25rem !important;
+            }
+            
+            h3.text-xl {
+                font-size: 1.1rem !important;
+            }
+            
+            h3.text-lg {
+                font-size: 1rem !important;
+            }
         }
         
+        /* Mobile landscape – short viewports (e.g. phone turned sideways) */
+        @media (max-width: 768px) and (orientation: landscape) and (max-height: 500px) {
+            header {
+                height: 40px;
+                min-height: 40px;
+                padding: 4px 10px;
+            }
+            main {
+                height: calc(100vh - 40px);
+            }
+            /* Shrink stat cards into a single compact row */
+            .stats-grid-mobile {
+                display: flex !important;
+                flex-direction: row !important;
+                gap: 6px !important;
+            }
+            .stat-card-mobile {
+                padding: 6px 7px !important;
+            }
+            .stat-card-mobile p.text-2xl {
+                font-size: 1.05rem !important;
+                line-height: 1.25 !important;
+            }
+            .stat-card-mobile p[class*="text-[10px]"] {
+                font-size: 8px !important;
+                margin-bottom: 1px !important;
+            }
+            .stat-card-mobile .zone-badge {
+                font-size: 7px !important;
+                padding: 1px 5px !important;
+            }
+            /* Compress chart containers */
+            .chart-container-mobile {
+                height: 180px !important;
+                padding: 10px 12px !important;
+            }
+            .chart-container-mobile h3 {
+                font-size: 11px !important;
+                margin-bottom: 4px !important;
+            }
+            /* Tighter sidebar */
+            aside {
+                max-width: 260px !important;
+            }
+            .sidebar-content {
+                padding: 10px 14px !important;
+            }
+            .sidebar-content .space-y-6 > * + * {
+                margin-top: 10px !important;
+            }
+            .preset-btn {
+                padding: 8px 10px !important;
+                min-height: 34px !important;
+                font-size: 10px !important;
+            }
+            /* FAB stays but shrinks */
+            .mobile-menu-btn {
+                width: 44px !important;
+                height: 44px !important;
+                bottom: 14px !important;
+                right: 14px !important;
+                font-size: 17px !important;
+            }
+        }
+
         /* Desktop - hide mobile menu button */
         @media (min-width: 769px) {
             .mobile-menu-btn {
@@ -1005,6 +1490,9 @@ html, body {
     </style>
 </head>
 <body class="h-screen overflow-hidden flex flex-col">
+    <!-- Animated environment background -->
+    <canvas id="env-canvas"></canvas>
+
     <!-- Onboarding Tutorial Overlay -->
     <div class="onboarding-overlay" id="onboarding-overlay">
         <div class="onboarding-card">
@@ -1113,6 +1601,15 @@ html, body {
     <!-- Mobile overlay -->
     <div class="mobile-overlay" id="mobile-overlay"></div>
     
+    <!-- Mobile Preferences Popup (points user to the FAB) -->
+    <div class="mobile-pref-popup" id="mobile-pref-popup">
+        <div class="bubble">
+            <div class="pop-icon"><i class="fa-solid fa-sliders"></i></div>
+            <div style="padding-right:18px;">Tap here to open<br><strong>Preferences</strong> &amp; adjust simulation values</div>
+            <button class="pop-close" onclick="closeMobilePrefPopup()" aria-label="Close">×</button>
+        </div>
+    </div>
+    
     <!-- Mobile menu button -->
     <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle menu">
         <i class="fa-solid fa-sliders"></i>
@@ -1120,15 +1617,6 @@ html, body {
     
     <!-- Toast notification -->
     <div class="toast" id="toast"></div>
-    
-    <!-- Mobile parameters indicator -->
-    <div class="mobile-params-indicator" id="mobile-params-indicator">
-        <button class="close-indicator" onclick="closeMobileIndicator()" aria-label="Close">×</button>
-        <div style="padding-right: 20px;">
-            <div style="font-size: 20px; margin-bottom: 6px;">👆</div>
-            <div>Tap the menu button to adjust simulation parameters!</div>
-        </div>
-    </div>
 
     <!-- Header -->
     <header class="h-16 border-b bg-white flex items-center justify-between px-6 shrink-0 z-50">
@@ -1140,11 +1628,11 @@ html, body {
         </div>
         
         <!-- Navigation Tabs -->
-        <nav class="flex h-full gap-8">
-            <button onclick="switchTab('concept')" id="tab-concept" class="h-full px-2 text-xs font-bold uppercase tracking-widest transition tab-active" style="background: white; border: none;">
+        <nav class="flex h-full gap-8" role="navigation" aria-label="Main navigation">
+            <button onclick="switchTab('concept')" id="tab-concept" class="h-full px-2 text-xs font-bold uppercase tracking-widest transition tab-active" style="background: white; border: none;" role="tab" aria-selected="true" aria-controls="section-concept" tabindex="0">
                 Concept
             </button>
-            <button onclick="switchTab('simulation')" id="tab-simulation" class="h-full px-2 text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-gray-600 transition" style="background: white; border: none;">
+            <button onclick="switchTab('simulation')" id="tab-simulation" class="h-full px-2 text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-gray-600 transition" style="background: white; border: none;" role="tab" aria-selected="false" aria-controls="section-simulation" tabindex="0">
                 Simulation
             </button>
         </nav>
@@ -1160,12 +1648,13 @@ html, body {
     <main class="flex-1 relative overflow-hidden bg-slate-50">
         
         <!-- SECTION: CONCEPT -->
-        <div id="section-concept" class="h-full overflow-y-auto bg-white custom-scroll">
-            <div class="max-w-5xl mx-auto p-12">
-                <header class="mb-12 border-b pb-8">
-                    <h2 class="text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">Operational Theory</h2>
-                    <p class="text-lg text-slate-500 leading-relaxed">A deep dive into Heti's forecasting, physics engines, and the Microgrid Controller logic.</p>
-                </header>
+        <div id="section-concept" class="h-full overflow-y-auto bg-white custom-scroll" role="tabpanel" aria-labelledby="tab-concept">
+            <div class="max-w-5xl mx-auto p-12" id="concept-container">
+                <!-- Microgrid Definition Box -->
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 2rem; border-radius: 1rem; margin-bottom: 3rem; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+                    <h2 style="color: white; font-size: 1.75rem; font-weight: 800; margin-bottom: 1rem; line-height: 1.3;">What is a microgrid?</h2>
+                    <p style="color: rgba(255,255,255,0.95); font-size: 1.05rem; line-height: 1.7; margin: 0;">Microgrids are small-scale power grids that operate independently to generate electricity for a localized area, such as a university campus, hospital complex, military base or geographical region.</p>
+                </div>
 
                 <div class="space-y-16">
                     <!-- 1. Solar Power Forecasting -->
@@ -1515,7 +2004,7 @@ html, body {
         </div>
 
         <!-- SECTION: SIMULATION -->
-        <div id="section-simulation" class="hidden-section flex h-full">
+        <div id="section-simulation" class="hidden-section flex h-full" role="tabpanel" aria-labelledby="tab-simulation">
             <aside id="mobile-sidebar" class="w-80 bg-white border-r flex flex-col overflow-hidden">
                 <div class="sidebar-content p-6 space-y-6 overflow-y-auto custom-scroll">
                 <div class="border-b pb-6">
@@ -1530,7 +2019,11 @@ html, body {
                                 </span>
                                 <span id="v-sol" class="text-amber-500 font-bold">60%</span>
                             </div>
-                            <input type="range" id="s-sol" class="w-full" min="0" max="100" value="60">
+                            <div class="slider-wrap">
+                                <div class="slider-track solar"></div>
+                                <div class="slider-fill" id="fill-sol"></div>
+                                <input type="range" id="s-sol" class="w-full" min="0" max="100" value="60" aria-label="Solar Intensity percentage">
+                            </div>
                         </div>
                         <div>
                             <div class="flex justify-between text-xs font-medium mb-2">
@@ -1541,7 +2034,11 @@ html, body {
                                 </span>
                                 <span id="v-wnd" class="text-blue-400 font-bold">30%</span>
                             </div>
-                            <input type="range" id="s-wnd" class="w-full" min="0" max="100" value="30">
+                            <div class="slider-wrap">
+                                <div class="slider-track wind"></div>
+                                <div class="slider-fill" id="fill-wnd"></div>
+                                <input type="range" id="s-wnd" class="w-full" min="0" max="100" value="30" aria-label="Wind Magnitude percentage">
+                            </div>
                         </div>
                         <div>
                             <div class="flex justify-between text-xs font-medium mb-2">
@@ -1552,7 +2049,11 @@ html, body {
                                 </span>
                                 <span id="v-lod" class="text-rose-500 font-bold">50 kW</span>
                             </div>
-                            <input type="range" id="s-lod" class="w-full" min="10" max="150" value="50">
+                            <div class="slider-wrap">
+                                <div class="slider-track load"></div>
+                                <div class="slider-fill" id="fill-lod"></div>
+                                <input type="range" id="s-lod" class="w-full" min="10" max="150" value="50" aria-label="Base Load Demand in kilowatts">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1570,7 +2071,11 @@ html, body {
                                     </span>
                                     <span id="v-bat" class="text-emerald-500 font-bold">200 kWh</span>
                                 </div>
-                                <input type="range" id="s-bat" class="w-full" min="50" max="1000" value="200">
+                                <div class="slider-wrap">
+                                    <div class="slider-track battery"></div>
+                                    <div class="slider-fill" id="fill-bat"></div>
+                                    <input type="range" id="s-bat" class="w-full" min="50" max="1000" value="200" aria-label="Battery Capacity in kilowatt-hours">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1594,9 +2099,9 @@ html, body {
                     </div>
 
                     <div class="pt-4 space-y-2">
-                        <button id="btn-grid" class="w-full py-3 rounded-xl bg-black text-white text-xs font-bold uppercase tracking-widest hover:bg-slate-800 transition">Toggle Power Grid</button>
-                        <button id="btn-storm" class="w-full py-3 rounded-xl bg-slate-800 text-white text-xs font-bold uppercase tracking-widest hover:bg-slate-900 transition">Simulate Storm</button>
-                        <button id="btn-reset" class="w-full py-3 rounded-xl border border-rose-200 text-rose-600 text-xs font-bold uppercase tracking-widest hover:bg-rose-50 transition">Factory Reset</button>
+                        <button id="btn-grid" class="w-full py-3 rounded-xl bg-black text-white text-xs font-bold uppercase tracking-widest hover:bg-slate-800 transition" aria-label="Toggle Power Grid connection on or off">Toggle Power Grid</button>
+                        <button id="btn-storm" class="w-full py-3 rounded-xl bg-slate-800 text-white text-xs font-bold uppercase tracking-widest hover:bg-slate-900 transition" aria-label="Simulate a storm scenario">Simulate Storm</button>
+                        <button id="btn-reset" class="w-full py-3 rounded-xl border border-rose-200 text-rose-600 text-xs font-bold uppercase tracking-widest hover:bg-rose-50 transition" aria-label="Reset all parameters to factory defaults">Factory Reset</button>
                     </div>
                 </div>
                 </div>
@@ -1611,18 +2116,23 @@ html, body {
                         <p id="goal-description">Try adjusting the sliders or selecting a preset scenario to see how different conditions affect your savings!</p>
                     </div>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 shrink-0 stats-grid-mobile">
-                        <div class="glass-panel p-5 rounded-2xl stat-card stat-card-mobile">
-                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Operational Cost</p>
-                            <p id="stat-cost" class="text-2xl font-bold">₹0.00</p>
-                        </div>
-                        <div class="glass-panel p-5 rounded-2xl stat-card stat-card-mobile">
-                            <p class="text-[10px] font-bold text-rose-600 uppercase tracking-widest mb-1">Baseline Comparison</p>
-                            <p id="stat-baseline" class="text-2xl font-bold text-rose-600">₹0.00</p>
-                        </div>
-                        <div class="glass-panel p-5 rounded-2xl stat-card stat-card-mobile border-l-4 border-l-emerald-500">
-                            <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-1">Total Savings</p>
-                            <p id="stat-savings" class="text-2xl font-bold text-emerald-600">₹0.00</p>
+                    <div class="bg-white border-2 border-slate-200 rounded-2xl p-6 shadow-sm mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 stats-grid-mobile">
+                            <div class="p-5 rounded-xl bg-slate-50 stat-card stat-card-mobile">
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Operational Cost</p>
+                                <p id="stat-cost" class="text-2xl font-bold">₹0.00</p>
+                                <div id="zone-cost" class="zone-badge optimal"><span class="zone-dot"></span>Optimal</div>
+                            </div>
+                            <div class="p-5 rounded-xl bg-slate-50 stat-card stat-card-mobile">
+                                <p class="text-[10px] font-bold text-rose-600 uppercase tracking-widest mb-1">Baseline Comparison</p>
+                                <p id="stat-baseline" class="text-2xl font-bold text-rose-600">₹0.00</p>
+                                <div id="zone-baseline" class="zone-badge optimal"><span class="zone-dot"></span>Optimal</div>
+                            </div>
+                            <div class="p-5 rounded-xl bg-emerald-50 stat-card stat-card-mobile border-2 border-emerald-200">
+                                <p class="text-[10px] font-bold text-emerald-700 uppercase tracking-widest mb-1">Total Savings</p>
+                                <p id="stat-savings" class="text-2xl font-bold text-emerald-600">₹0.00</p>
+                                <div id="zone-savings" class="zone-badge optimal"><span class="zone-dot"></span>Optimal</div>
+                            </div>
                         </div>
                     </div>
 
@@ -1633,7 +2143,7 @@ html, body {
                     </button>
 
                     <div class="grid grid-cols-1 gap-6">
-                        <div class="h-[400px] chart-container-mobile glass-panel p-6 rounded-2xl flex flex-col">
+                        <div class="h-[500px] chart-container-mobile p-8 rounded-2xl flex flex-col border-4 border-slate-800 bg-white shadow-lg">
                             <div class="flex justify-between items-center mb-4 shrink-0">
                                 <h3 class="text-sm font-bold">Power Dispatch Profile (24h)</h3>
                                 <div class="flex gap-4 text-[10px] font-bold">
@@ -1647,9 +2157,9 @@ html, body {
                             </div>
                         </div>
 
-                        <div class="h-[400px] chart-container-mobile glass-panel p-6 rounded-2xl flex flex-col">
+                        <div class="h-[500px] chart-container-mobile p-8 rounded-2xl flex flex-col border-4 border-slate-800 bg-white shadow-lg">
                             <div class="flex justify-between items-center mb-4 shrink-0">
-                                <h3 class="text-lg font-extrabold text-slate-800">Battery State of Charge (%)</h3>
+                                <h3 class="text-sm font-bold">Battery State of Charge (%)</h3>
                                 <div class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded">STORAGE CAPACITY MONITOR</div>
                             </div>
                             <div class="flex-1 min-h-0 relative">
@@ -1666,7 +2176,7 @@ html, body {
                         <p class="text-slate-600">The most effective strategy uses a "nested" approach: Day-Ahead Planning (for long-term cost) and Real-Time Rescheduling (for immediate physics).</p>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+                    <div class="grid grid-cols-1 gap-6 mb-10">
                         <div class="bg-white p-6 rounded-xl border-l-4 border-l-violet-500">
                             <div class="flex items-center gap-3 mb-4">
                                 <div class="w-10 h-10 rounded-lg bg-violet-100 text-violet-600 flex items-center justify-center font-bold">1</div>
@@ -1703,7 +2213,7 @@ html, body {
                                 J = min Σ<sub>t=1→24</sub> [C<sub>grid</sub>(t) · P<sub>grid</sub>(t)] + [C<sub>fuel</sub> · F(P<sub>gen,t</sub>)] + [C<sub>deg</sub> · |P<sub>bat,t</sub>|]
                             </div>
                         </div>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                        <div class="space-y-4 text-xs">
                             <div class="bg-slate-800 p-4 rounded-lg">
                                 <div class="font-bold text-blue-400 mb-1">Grid Cost (C<sub>grid</sub>)</div>
                                 <div class="text-slate-400">Fluctuates based on Time-of-Use (ToU) rates.</div>
@@ -1795,7 +2305,7 @@ html, body {
                     <div class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white p-8 rounded-2xl">
                         <h3 class="text-2xl font-bold mb-4">Summary of Benefits</h3>
                         <p class="text-emerald-50 mb-6">By using this predictive strategy instead of a simple "rule-based" (if-then) approach, microgrids typically see:</p>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="space-y-4">
                             <div class="bg-white/10 backdrop-blur-sm p-6 rounded-xl">
                                 <div class="text-4xl font-bold mb-2">15–25%</div>
                                 <div class="text-emerald-50 text-sm">Reduction in total electricity costs</div>
@@ -1832,50 +2342,44 @@ html, body {
                 conSection.classList.add('hidden-section');
                 tabSim.classList.add('tab-active');
                 tabSim.classList.remove('text-gray-400');
+                tabSim.setAttribute('aria-selected', 'true');
                 tabCon.classList.remove('tab-active');
                 tabCon.classList.add('text-gray-400');
+                tabCon.setAttribute('aria-selected', 'false');
                 exportBtn.classList.remove('hidden');
                 if (pChart) pChart.resize();
                 if (sChart) sChart.resize();
                 
-                // Show mobile indicator on first visit to simulation tab
+                // Show mobile popup on first visit to simulation tab
                 if (window.innerWidth <= 768) {
-                    showMobileParamsIndicator();
+                    showMobilePrefPopup();
                 }
             } else {
                 simSection.classList.add('hidden-section');
                 conSection.classList.remove('hidden-section');
                 tabCon.classList.add('tab-active');
                 tabCon.classList.remove('text-gray-400');
+                tabCon.setAttribute('aria-selected', 'true');
                 tabSim.classList.remove('tab-active');
                 tabSim.classList.add('text-gray-400');
+                tabSim.setAttribute('aria-selected', 'false');
                 exportBtn.classList.add('hidden');
             }
         }
         
-        // Show mobile parameters indicator
-        function showMobileParamsIndicator() {
-            const indicator = document.getElementById('mobile-params-indicator');
-            const hasSeenIndicator = localStorage.getItem('hasSeenMobileParamsIndicator');
-            
-            if (!hasSeenIndicator) {
-                setTimeout(() => {
-                    indicator.classList.add('show');
-                    
-                    // Auto-hide after 8 seconds
-                    setTimeout(() => {
-                        indicator.classList.remove('show');
-                        localStorage.setItem('hasSeenMobileParamsIndicator', 'true');
-                    }, 8000);
-                }, 500);
-            }
+        // ─── Mobile Preferences Popup ───
+        let _prefPopupShown = false;            // track within session
+        function showMobilePrefPopup() {
+            if (_prefPopupShown) return;         // only once per session
+            _prefPopupShown = true;
+            const popup = document.getElementById('mobile-pref-popup');
+            setTimeout(() => popup.classList.add('show'), 600);
+            // auto-dismiss after 6 s
+            setTimeout(() => popup.classList.remove('show'), 6600);
         }
-        
-        // Close mobile indicator
-        function closeMobileIndicator() {
-            const indicator = document.getElementById('mobile-params-indicator');
-            indicator.classList.remove('show');
-            localStorage.setItem('hasSeenMobileParamsIndicator', 'true');
+
+        function closeMobilePrefPopup() {
+            document.getElementById('mobile-pref-popup').classList.remove('show');
         }
 
         const inputs = {
@@ -1894,6 +2398,29 @@ html, body {
             statBaseline: document.getElementById('stat-baseline'),
             statSavings: document.getElementById('stat-savings')
         };
+
+        // Update slider fills to show progress (global function)
+        function updateSliderFills() {
+            // Solar slider (0-100)
+            const solPercent = (inputs.sol.value / 100) * 100;
+            const fillSol = document.getElementById('fill-sol');
+            if (fillSol) fillSol.style.width = solPercent + '%';
+            
+            // Wind slider (0-100)
+            const wndPercent = (inputs.wnd.value / 100) * 100;
+            const fillWnd = document.getElementById('fill-wnd');
+            if (fillWnd) fillWnd.style.width = wndPercent + '%';
+            
+            // Load slider (10-150)
+            const lodPercent = ((inputs.lod.value - 10) / (150 - 10)) * 100;
+            const fillLod = document.getElementById('fill-lod');
+            if (fillLod) fillLod.style.width = lodPercent + '%';
+            
+            // Battery slider (50-1000)
+            const batPercent = ((inputs.bat.value - 50) / (1000 - 50)) * 100;
+            const fillBat = document.getElementById('fill-bat');
+            if (fillBat) fillBat.style.width = batPercent + '%';
+        }
 
         function calculateSimulation() {
             const T = Array.from({length: 24}, (_, i) => i);
@@ -2004,7 +2531,28 @@ html, body {
                 view.statSavings.className = 'text-2xl font-bold text-rose-600';
             }
 
-            // Battery status indicator removed from UI
+            // --- Zone indicators ---
+            function setZone(el, zone, label) {
+                el.className = 'zone-badge ' + zone;
+                el.innerHTML = '<span class="zone-dot"></span>' + label;
+            }
+            // Cost zone: optimal < 30% of baseline, warning 30-60%, critical > 60%
+            const costRatio = d.baseline > 0 ? d.cost / d.baseline : 0;
+            if (costRatio <= 0.3) setZone(document.getElementById('zone-cost'), 'optimal', 'Optimal');
+            else if (costRatio <= 0.6) setZone(document.getElementById('zone-cost'), 'warning', 'Warning');
+            else setZone(document.getElementById('zone-cost'), 'critical', 'High');
+
+            // Baseline zone: high baseline means heavy grid dependency
+            const baselineKW = parseFloat(inputs.lod.value);
+            if (baselineKW <= 60) setZone(document.getElementById('zone-baseline'), 'optimal', 'Low');
+            else if (baselineKW <= 100) setZone(document.getElementById('zone-baseline'), 'warning', 'Moderate');
+            else setZone(document.getElementById('zone-baseline'), 'critical', 'High');
+
+            // Savings zone: positive = optimal, small positive = warning, negative = critical
+            const sav = d.baseline - d.cost;
+            if (sav >= d.baseline * 0.2) setZone(document.getElementById('zone-savings'), 'optimal', 'Optimal');
+            else if (sav >= 0) setZone(document.getElementById('zone-savings'), 'warning', 'Marginal');
+            else setZone(document.getElementById('zone-savings'), 'critical', 'Loss');
 
 
             // Status pill removed from UI
@@ -2118,7 +2666,21 @@ html, body {
                 }
             });
 
-            Object.values(inputs).forEach(i => i.addEventListener('input', refreshSimulation));
+            // Debounced refresh: label updates are instant, chart math waits 80ms after drag stops
+            let debounceTimer = null;
+            function debouncedRefresh() {
+                // Instant label feedback
+                view.vSol.innerText = inputs.sol.value + "%";
+                view.vWnd.innerText = inputs.wnd.value + "%";
+                view.vLod.innerText = inputs.lod.value + " kW";
+                view.vBat.innerText = inputs.bat.value + " kWh";
+                // Update slider fills
+                updateSliderFills();
+                // Debounce the heavy chart work
+                if (debounceTimer) clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(refreshSimulation, 80);
+            }
+            Object.values(inputs).forEach(i => i.addEventListener('input', debouncedRefresh));
             document.getElementById('btn-grid').onclick = () => { 
                 gridActive = !gridActive; 
                 refreshSimulation(); 
@@ -2127,19 +2689,24 @@ html, body {
             document.getElementById('btn-storm').onclick = () => { 
                 inputs.sol.value = 5; 
                 inputs.wnd.value = 85;  // CRITICAL FIX: Increase wind during storm
-                gridActive = false; 
+                gridActive = false;
+                updateSliderFills();
                 refreshSimulation();
                 showToast('Storm scenario activated ⚠️');
             };
             document.getElementById('btn-reset').onclick = () => { 
                 inputs.sol.value = 60; inputs.wnd.value = 30; inputs.lod.value = 50; inputs.bat.value = 200;
-                gridActive = true; 
+                gridActive = true;
+                updateSliderFills();
                 refreshSimulation();
                 showToast('Reset to defaults ✓');
             };
             
             // Export functionality
             document.getElementById('btn-export').onclick = exportData;
+            
+            // Initialize slider fills
+            updateSliderFills();
             
             refreshSimulation();
         }
@@ -2177,6 +2744,7 @@ html, body {
                     scenarioName = 'Nighttime';
                     break;
             }
+            updateSliderFills();
             refreshSimulation();
             showToast(`${scenarioName} scenario applied ✓`);
         }
@@ -2491,6 +3059,22 @@ html, body {
         window.onload = function() {
             initSimulation();
             initTooltips();
+
+            // Keyboard arrow navigation between tabs
+            document.querySelector('nav').addEventListener('keydown', function(e) {
+                const tabs = [document.getElementById('tab-concept'), document.getElementById('tab-simulation')];
+                const idx = tabs.indexOf(document.activeElement);
+                if (idx === -1) return;
+                if (e.key === 'ArrowRight' && idx < tabs.length - 1) {
+                    e.preventDefault();
+                    tabs[idx + 1].focus();
+                    tabs[idx + 1].click();
+                } else if (e.key === 'ArrowLeft' && idx > 0) {
+                    e.preventDefault();
+                    tabs[idx - 1].focus();
+                    tabs[idx - 1].click();
+                }
+            });
             
             // Mobile menu button handler
             const menuBtn = document.getElementById('mobile-menu-btn');
@@ -2514,6 +3098,186 @@ html, body {
                 });
             });
         };
+        // ═══════════════════════════════════════════
+        // ANIMATED ENVIRONMENT ENGINE
+        // Reads solar slider → paints sky, sun/moon, clouds, rain
+        // ═══════════════════════════════════════════
+        (function() {
+            const canvas = document.getElementById('env-canvas');
+            const ctx = canvas.getContext('2d');
+            let clouds = [], raindrops = [], animFrame;
+            let isStorm = false; // set true when storm scenario is active
+
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            // Seed clouds
+            function seedClouds(count) {
+                clouds = [];
+                for (let i = 0; i < count; i++) {
+                    clouds.push({
+                        x: Math.random() * canvas.width * 1.3 - canvas.width * 0.15,
+                        y: 60 + Math.random() * (canvas.height * 0.28),
+                        w: 80 + Math.random() * 140,
+                        h: 28 + Math.random() * 30,
+                        speed: 0.15 + Math.random() * 0.25,
+                        alpha: 0.55 + Math.random() * 0.35
+                    });
+                }
+            }
+            seedClouds(7);
+
+            // Seed raindrops
+            function seedRain(count) {
+                raindrops = [];
+                for (let i = 0; i < count; i++) {
+                    raindrops.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height,
+                        len: 12 + Math.random() * 18,
+                        speed: 6 + Math.random() * 7,
+                        alpha: 0.25 + Math.random() * 0.35
+                    });
+                }
+            }
+            seedRain(90);
+
+            function getSolarVal() {
+                const el = document.getElementById('s-sol');
+                return el ? parseFloat(el.value) / 100 : 0.6;
+            }
+            function getWindVal() {
+                const el = document.getElementById('s-wnd');
+                return el ? parseFloat(el.value) / 100 : 0.3;
+            }
+
+            function lerp(a, b, t) { return a + (b - a) * t; }
+
+            function drawSkyGradient(sol) {
+                // Night (sol<0.08) → Dawn (0.08-0.22) → Day (0.22-0.78) → Dusk (0.78-0.92) → Night (>0.92)
+                let topColor, botColor;
+                if (sol < 0.08) {
+                    topColor = {r:8, g:10, b:30};   botColor = {r:16, g:18, b:45};
+                } else if (sol < 0.22) {
+                    const t = (sol - 0.08) / 0.14;
+                    topColor = {r: lerp(8,30,t)|0, g: lerp(10,60,t)|0, b: lerp(30,100,t)|0};
+                    botColor = {r: lerp(16,180,t)|0, g: lerp(18,100,t)|0, b: lerp(45,60,t)|0};
+                } else if (sol < 0.78) {
+                    const t = (sol - 0.22) / 0.56;
+                    topColor = {r: lerp(30,135,t)|0, g: lerp(60,200,t)|0, b: lerp(100,235,t)|0};
+                    botColor = {r: lerp(180,200,t)|0, g: lerp(100,225,t)|0, b: lerp(60,250,t)|0};
+                } else if (sol < 0.92) {
+                    const t = (sol - 0.78) / 0.14;
+                    topColor = {r: lerp(135,8,t)|0, g: lerp(200,10,t)|0, b: lerp(235,30,t)|0};
+                    botColor = {r: lerp(200,180,1-t)|0, g: lerp(225,100,1-t)|0, b: lerp(250,60,1-t)|0};
+                } else {
+                    topColor = {r:8, g:10, b:30};   botColor = {r:16, g:18, b:45};
+                }
+                const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                grad.addColorStop(0, `rgb(${topColor.r},${topColor.g},${topColor.b})`);
+                grad.addColorStop(1, `rgb(${botColor.r},${botColor.g},${botColor.b})`);
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+
+            function drawSun(sol) {
+                if (sol < 0.06 || sol > 0.94) return; // fully dark
+                const isMoon = sol < 0.15 || sol > 0.85;
+                // arc position across sky
+                const progress = Math.max(0, Math.min(1, (sol - 0.06) / 0.88));
+                const sunX = canvas.width * (0.08 + progress * 0.84);
+                const sunY = canvas.height * (0.32 - Math.sin(progress * Math.PI) * 0.22);
+                const radius = isMoon ? 16 : 22;
+
+                if (!isMoon) {
+                    // Glow
+                    const glow = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, radius * 3.2);
+                    glow.addColorStop(0, 'rgba(255,235,150,0.45)');
+                    glow.addColorStop(0.5, 'rgba(255,200,80,0.12)');
+                    glow.addColorStop(1, 'rgba(255,180,50,0)');
+                    ctx.fillStyle = glow;
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                }
+
+                ctx.beginPath();
+                ctx.arc(sunX, sunY, radius, 0, Math.PI * 2);
+                ctx.fillStyle = isMoon ? '#dde6f0' : '#fff7a0';
+                ctx.fill();
+            }
+
+            function drawClouds(sol) {
+                const windVal = getWindVal();
+                const cloudCount = isStorm ? 11 : (sol < 0.25 || sol > 0.75 ? 5 : 7 + Math.round(windVal * 4));
+                while (clouds.length < cloudCount) seedClouds(cloudCount);
+
+                const isDark = sol < 0.15 || sol > 0.85;
+                clouds.forEach(c => {
+                    c.x += c.speed + (isStorm ? 0.6 : 0);
+                    if (c.x - c.w > canvas.width) {
+                        c.x = -c.w;
+                        c.y = 50 + Math.random() * (canvas.height * 0.28);
+                    }
+                    const baseR = isStorm ? 55 : (isDark ? 40 : 210);
+                    const baseG = isStorm ? 55 : (isDark ? 42 : 218);
+                    const baseB = isStorm ? 60 : (isDark ? 55 : 230);
+                    ctx.beginPath();
+                    ctx.ellipse(c.x, c.y, c.w * 0.5, c.h * 0.5, 0, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(${baseR},${baseG},${baseB},${c.alpha})`;
+                    ctx.fill();
+                    // Second puff for volume
+                    ctx.beginPath();
+                    ctx.ellipse(c.x + c.w * 0.15, c.y - c.h * 0.12, c.w * 0.32, c.h * 0.42, 0, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(${baseR},${baseG},${baseB},${c.alpha * 0.7})`;
+                    ctx.fill();
+                });
+            }
+
+            function drawRain(sol) {
+                const windVal = getWindVal();
+                // Rain when: storm is active, OR wind > 75 and solar < 25
+                const shouldRain = isStorm || (windVal > 0.75 && sol < 0.25);
+                if (!shouldRain) return;
+
+                const intensity = isStorm ? 1 : Math.min(1, (windVal - 0.75) / 0.25);
+                const count = Math.round(60 + intensity * 50);
+                while (raindrops.length < count) {
+                    raindrops.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, len: 14 + Math.random() * 16, speed: 7 + Math.random() * 6, alpha: 0.2 + Math.random() * 0.3 });
+                }
+
+                ctx.strokeStyle = `rgba(170,200,230,${0.5 * intensity})`;
+                ctx.lineWidth = 1.2;
+                for (let i = 0; i < count && i < raindrops.length; i++) {
+                    const r = raindrops[i];
+                    r.y += r.speed;
+                    r.x += 0.8; // slight wind drift
+                    if (r.y > canvas.height) { r.y = 0; r.x = Math.random() * canvas.width; }
+                    ctx.beginPath();
+                    ctx.moveTo(r.x, r.y);
+                    ctx.lineTo(r.x + 1.5, r.y + r.len);
+                    ctx.stroke();
+                }
+            }
+
+            function frame() {
+                const sol = getSolarVal();
+                // Detect storm: solar ≤ 5 AND grid is off (storm scenario sets both)
+                isStorm = (sol <= 0.06 && !gridActive);
+
+                canvas.classList.toggle('visible', document.getElementById('section-simulation') && !document.getElementById('section-simulation').classList.contains('hidden-section'));
+
+                drawSkyGradient(sol);
+                drawSun(sol);
+                drawClouds(sol);
+                drawRain(sol);
+
+                animFrame = requestAnimationFrame(frame);
+            }
+            frame();
+        })();
     </script>
 </body>
 </html>
